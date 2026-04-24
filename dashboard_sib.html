@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Integrado de Bibliotecas da UFRPE — Prestação de Contas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:#e2e0d8;--border2:#ccc9be;
+  --text:#1a1916;--text2:#6b6860;--text3:#9e9b93;
+  --accent:#1d4ed8;--accent-light:#eff4ff;
+  --amber:#92400e;--amber-light:#fef3c7;
+  --rose:#9f1239;--rose-light:#fff1f2;
+  --purple:#5b21b6;--teal:#0f766e;--teal-light:#f0fdf9;
+  --radius:10px;--radius-lg:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.logo-mark{display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px;fill:white}
+.logo-text{font-size:13px;font-weight:600;letter-spacing:-.01em}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sidebar-section{padding:0 12px;margin-bottom:8px}
+.sidebar-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:background .12s,color .12s;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:500}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.5}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;vertical-align:middle}
+.main{flex:1;min-width:0;padding:28px 32px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.page-meta{font-size:13px;color:var(--text2);margin-top:3px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.select-wrap{position:relative}
+.select-wrap select{appearance:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 32px 7px 12px;font-family:inherit;font-size:13px;color:var(--text);cursor:pointer;outline:none;transition:border-color .15s}
+.select-wrap select:hover{border-color:var(--border2)}
+.select-wrap::after{content:'';position:absolute;right:10px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-top-color:var(--text3);pointer-events:none;margin-top:2px}
+.btn-refresh{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 14px;font-family:inherit;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s}
+.btn-refresh:hover{border-color:var(--border2);color:var(--text)}
+.btn-refresh svg{width:14px;height:14px}
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:16px}
+.spinner{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text3)}
+.error-state{background:var(--rose-light);border:1px solid #fecdd3;border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;font-size:13px;color:var(--rose)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow);transition:box-shadow .15s}
+.kpi-card:hover{box-shadow:var(--shadow-md)}
+.kpi-label{font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:500;letter-spacing:.01em}
+.kpi-value{font-size:24px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.kpi-sub{font-size:12px;color:var(--text3);margin-top:6px}
+.kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.section-title{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.01em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.charts-row{display:grid;gap:12px;margin-bottom:12px}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.card-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.chart-wrap{position:relative;width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--text2)}
+.legend span{display:flex;align-items:center;gap:5px}
+.leg-sq{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.table-wrap{overflow-x:auto}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt thead th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:0 12px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.dt tbody td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.dt tbody tr:last-child td{border-bottom:none}
+.dt tbody tr:hover td{background:var(--surface2)}
+.num{text-align:right;font-family:'DM Mono',monospace;font-weight:500}
+.pct{text-align:right;color:var(--text3);font-size:12px}
+.lib-pill{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.lib-pip{width:7px;height:7px;border-radius:50%}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:100px}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-amber{background:var(--amber-light);color:var(--amber)}
+.badge-blue{background:var(--accent-light);color:var(--accent)}
+.badge-purple{background:#f5f3ff;color:#5b21b6}
+.badge-teal{background:#f0fdf9;color:#0f766e}
+.badge-gray{background:var(--surface2);color:var(--text3)}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px}
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow)}
+.detail-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.detail-name{font-size:14px;font-weight:600}
+.detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-stat{background:var(--surface2);border-radius:8px;padding:10px 12px}
+.detail-stat-label{font-size:11px;color:var(--text3);margin-bottom:3px}
+.detail-stat-value{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.tab-bar{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s;user-select:none;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.view{display:none}
+.view.active{display:block}
+.sub-tab-bar{display:flex;gap:2px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+.sub-tab{padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s;user-select:none}
+.sub-tab:hover{color:var(--text2)}
+.sub-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.sub-panel{display:none}
+.sub-panel.active{display:block}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.progress-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;text-align:right}
+.progress-bar-bg{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.progress-val{font-size:12px;font-weight:500;color:var(--text);width:60px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+.area-chip{display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:var(--surface2);color:var(--text3);margin-right:6px;letter-spacing:.02em}
+.info-banner{background:var(--accent-light);border:1px solid #bfdbfe;border-radius:var(--radius);padding:12px 16px;font-size:13px;color:var(--accent);margin-bottom:16px}
+@media(max-width:1000px){.sidebar{display:none}.main{padding:20px 16px}.cols-2,.cols-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div><div class="logo-text">SiB</div><div class="logo-sub">Sistema Integrado de Bibliotecas da UFRPE</div></div>
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Indicadores gerais</div>
+    <div class="nav-item active" onclick="setTab('geral',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Visão geral
+    </div>
+    <div class="nav-item" onclick="setTab('acervo',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Acervo
+    </div>
+    <div class="nav-item" onclick="setTab('circulacao',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Circulação
+    </div>
+    <div class="nav-item" onclick="setTab('restauracao',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Livros restaurados
+    </div>
+    <div class="nav-item" onclick="setTab('treinamentos',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Treinamentos
+    </div>
+    <div class="nav-item" onclick="setTab('deposito',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Depósito legal
+    </div>
+    <div class="nav-item" onclick="setTab('detalhe',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Por biblioteca
+    </div>
+    <div class="nav-item" onclick="setTab('multa',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Multa Solidária
+    </div>
+    <div class="nav-item" onclick="setTab('normalizacao',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Normalização
+    </div>
+  </div>
+  <div class="sidebar-section" style="margin-top:4px">
+    <div class="sidebar-label">Serviços centrais</div>
+    <div class="nav-item" onclick="setTab('comut',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>COMUT
+    </div>
+    <div class="nav-item" onclick="setTab('bases',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Bases de dados
+    </div>
+    <div class="nav-item" onclick="setTab('minhaBib',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Minha Biblioteca
+    </div>
+  </div>
+  <div class="sidebar-section" style="margin-top:8px">
+    <div class="sidebar-label">Bibliotecas</div>
+    <div id="lib-nav"></div>
+  </div>
+  <div class="sidebar-footer">
+    <span class="status-dot"></span>Conectado ao Google Sheets<br>
+    <span style="margin-left:10px">Dados ao vivo</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dados do SIB-UFRPE</div>
+      <div class="page-meta" id="page-meta">Carregando dados…</div>
+    </div>
+    <div class="controls">
+      <div class="select-wrap">
+        <select id="sel-tri" onchange="loadAll()">
+          <option value="1">1º trimestre</option>
+          <option value="2">2º trimestre</option>
+          <option value="3" selected>3º trimestre</option>
+          <option value="4">4º trimestre</option>
+        </select>
+      </div>
+      <div class="select-wrap"><select id="sel-ano" onchange="loadAll()"></select></div>
+      <button class="btn-refresh" onclick="loadAll()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div id="error-box" style="display:none" class="error-state"></div>
+  <div id="loading" class="loading-state">
+    <div class="spinner"></div>
+    <div class="loading-text">Buscando dados das planilhas…</div>
+  </div>
+
+  <div id="content" style="display:none">
+    <div class="tab-bar">
+      <div class="tab active" onclick="setTab('geral',this)">Visão geral</div>
+      <div class="tab" onclick="setTab('acervo',this)">Acervo</div>
+      <div class="tab" onclick="setTab('circulacao',this)">Circulação</div>
+      <div class="tab" onclick="setTab('restauracao',this)">Restauração</div>
+      <div class="tab" onclick="setTab('treinamentos',this)">Treinamentos</div>
+      <div class="tab" onclick="setTab('deposito',this)">Depósito legal</div>
+      <div class="tab" onclick="setTab('comut',this)">COMUT</div>
+      <div class="tab" onclick="setTab('bases',this)">Bases de dados</div>
+      <div class="tab" onclick="setTab('minhaBib',this)">Minha Biblioteca</div>
+      <div class="tab" onclick="setTab('multa',this)">Multa Solidária</div>
+      <div class="tab" onclick="setTab('normalizacao',this)">Normalização</div>
+      <div class="tab" onclick="setTab('detalhe',this)">Por biblioteca</div>
+    </div>
+
+    <!-- VISÃO GERAL -->
+    <div id="view-geral" class="view active">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="section-title">Circulação</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Empréstimos por biblioteca</div>
+          <div class="card-sub">Comparativo trimestral</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="c-emp" role="img" aria-label="Empréstimos por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Participação no total de empréstimos</div>
+          <div class="card-sub">% por unidade</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="c-pizza" role="img" aria-label="Distribuição de empréstimos"></canvas></div>
+          <div class="legend" id="leg-pizza"></div>
+        </div>
+      </div>
+      <div class="section-title">Acervo</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Títulos por biblioteca</div>
+          <div class="card-sub">Total no período</div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c-titulos" role="img" aria-label="Títulos por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Exemplares por biblioteca</div>
+          <div class="card-sub">Total no período</div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c-exemplares" role="img" aria-label="Exemplares por biblioteca"></canvas></div>
+        </div>
+      </div>
+      <div class="section-title">Outros indicadores</div>
+      <div class="charts-row cols-3">
+        <div class="card">
+          <div class="card-title">Eventos por biblioteca</div>
+          <div class="card-sub">No trimestre</div>
+          <div class="chart-wrap" style="height:180px"><canvas id="c-evt" role="img" aria-label="Eventos por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Atendimentos por biblioteca</div>
+          <div class="card-sub">No trimestre</div>
+          <div class="chart-wrap" style="height:180px"><canvas id="c-atend-bar" role="img" aria-label="Atendimentos por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Usuários treinados</div>
+          <div class="card-sub">Por biblioteca no trimestre</div>
+          <div class="chart-wrap" style="height:180px"><canvas id="c-trein-bar" role="img" aria-label="Usuários treinados por biblioteca"></canvas></div>
+        </div>
+      </div>
+      <div class="section-title">Resumo consolidado</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Biblioteca</th><th>Atendimentos</th><th>Empréstimos</th>
+              <th>Devoluções</th><th>Títulos</th><th>Exemplares</th>
+              <th>Treinamentos</th><th>Eventos</th><th>Status</th>
+            </tr></thead>
+            <tbody id="tabela"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACERVO -->
+    <div id="view-acervo" class="view">
+      <div class="section-title">Acervo por área do conhecimento — sistema</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Títulos por área</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-area-titulos" role="img" aria-label="Títulos por área"></canvas></div>
+          <div class="legend" id="leg-area-titulos"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Exemplares por área</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-area-exemplares" role="img" aria-label="Exemplares por área"></canvas></div>
+          <div class="legend" id="leg-area-exemplares"></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="acervo-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px"></div>
+      <div class="section-title">Tipos de doação — sistema</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Distribuição por tipo de doação</div>
+          <div class="card-sub">Todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-doacao" role="img" aria-label="Tipos de doação"></canvas></div>
+          <div class="legend" id="leg-doacao"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Títulos por tipo de doação e biblioteca</div>
+          <div class="card-sub">Participação relativa</div>
+          <div id="doacao-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CIRCULAÇÃO -->
+    <div id="view-circulacao" class="view">
+      <div class="section-title">Empréstimos e devoluções por área — sistema</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Empréstimos por área do conhecimento</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-circ-emp" role="img" aria-label="Empréstimos por área"></canvas></div>
+          <div class="legend" id="leg-circ-emp"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Devoluções por área do conhecimento</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-circ-dev" role="img" aria-label="Devoluções por área"></canvas></div>
+          <div class="legend" id="leg-circ-dev"></div>
+        </div>
+      </div>
+      <div class="section-title">Comparativo empréstimos × devoluções por área</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Empréstimos vs. devoluções</div>
+        <div class="card-sub">Barras agrupadas por área do conhecimento — sistema consolidado</div>
+        <div class="chart-wrap" style="height:300px"><canvas id="c-circ-grouped" role="img" aria-label="Comparativo por área"></canvas></div>
+        <div class="legend" id="leg-circ-grouped"></div>
+        <div class="legend" id="leg-circ-areas" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px"></div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="circ-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
+    <!-- RESTAURAÇÃO -->
+    <div id="view-restauracao" class="view">
+      <div class="kpi-grid" id="kpi-rest"></div>
+      <div class="section-title">Materiais por área do conhecimento — sistema</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Materiais danificados por área</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-rest-dan" role="img" aria-label="Danificados por área"></canvas></div>
+          <div class="legend" id="leg-rest-dan"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Materiais restaurados por área</div>
+          <div class="card-sub">Soma de todas as bibliotecas</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-rest-res" role="img" aria-label="Restaurados por área"></canvas></div>
+          <div class="legend" id="leg-rest-res"></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="rest-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
+    <!-- TREINAMENTOS -->
+    <div id="view-treinamentos" class="view">
+      <div class="kpi-grid" id="kpi-trein"></div>
+      <div class="section-title">Treinamentos — sistema consolidado</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Usuários treinados por biblioteca</div>
+          <div class="card-sub">Total no trimestre</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="c-trein-lib" role="img" aria-label="Usuários treinados por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribuição por modalidade</div>
+          <div class="card-sub">Presencial, remoto, híbrido</div>
+          <div class="chart-wrap" style="height:220px"><canvas id="c-trein-mod" role="img" aria-label="Distribuição por modalidade"></canvas></div>
+          <div class="legend" id="leg-trein-mod"></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="trein-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
+    <!-- DEPÓSITO LEGAL -->
+    <div id="view-deposito" class="view">
+      <div class="kpi-grid" id="kpi-dep"></div>
+      <div class="section-title">Depósito legal — sistema consolidado</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Recebidos vs. embargados por tipo</div>
+          <div class="card-sub">Barras agrupadas — sistema</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-dep-grouped" role="img" aria-label="Depósito legal por tipo"></canvas></div>
+          <div class="legend" id="leg-dep-grouped"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribuição de trabalhos recebidos</div>
+          <div class="card-sub">Por tipo de trabalho — sistema</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-dep-pizza" role="img" aria-label="Tipos de trabalho recebidos"></canvas></div>
+          <div class="legend" id="leg-dep-pizza"></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="dep-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
+    <!-- COMUT -->
+    <div id="view-comut" class="view">
+      <div class="info-banner">Serviço centralizado — dados independentes das bibliotecas do sistema.</div>
+      <div class="kpi-grid" id="kpi-comut"></div>
+      <div class="section-title">Indicadores COMUT</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Trabalhos solicitados vs. recuperados</div>
+          <div class="card-sub">Comparativo trimestral</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-comut-trab" role="img" aria-label="Trabalhos COMUT"></canvas></div>
+          <div class="legend" id="leg-comut-trab"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Solicitações externas</div>
+          <div class="card-sub">Recebidas/atendidas vs. canceladas/repassadas</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-comut-ext" role="img" aria-label="Solicitações externas COMUT"></canvas></div>
+          <div class="legend" id="leg-comut-ext"></div>
+        </div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Trimestre</th><th>Atendimentos</th><th>Ref. pesquisadas</th>
+              <th>Trab. solicitados</th><th>Trab. recuperados</th>
+              <th>Sol. ext. recebidas/atendidas</th><th>Sol. ext. canceladas/repassadas</th>
+            </tr></thead>
+            <tbody id="tabela-comut"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BASES DE DADOS -->
+    <div id="view-bases" class="view">
+      <div class="info-banner">Serviço centralizado — dados independentes das bibliotecas do sistema.</div>
+      <div class="kpi-grid" id="kpi-bases"></div>
+      <div class="section-title">Acessos por base de dados</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Número de acessos por base</div>
+          <div class="card-sub">No trimestre selecionado</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-bases-bar" role="img" aria-label="Acessos por base de dados"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Participação por base</div>
+          <div class="card-sub">% do total de acessos</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-bases-pizza" role="img" aria-label="Distribuição de acessos"></canvas></div>
+          <div class="legend" id="leg-bases-pizza"></div>
+        </div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr><th>Base de dados</th><th>Acessos</th><th>% do total</th></tr></thead>
+            <tbody id="tabela-bases"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINHA BIBLIOTECA -->
+    <div id="view-minhaBib" class="view">
+      <div class="info-banner">Serviço centralizado — dados de usuários cadastrados no sistema Minha Biblioteca.</div>
+      <div class="kpi-grid" id="kpi-minhaBib"></div>
+      <div class="section-title">Usuários cadastrados por trimestre</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Usuários cadastrados</div>
+          <div class="card-sub">Evolução por trimestre</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-bar" role="img" aria-label="Usuários cadastrados por trimestre"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribuição por trimestre</div>
+          <div class="card-sub">Participação percentual</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-pizza" role="img" aria-label="Distribuição de cadastros Minha Biblioteca"></canvas></div>
+          <div class="legend" id="leg-minhaBib-pizza"></div>
+        </div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Trimestre</th>
+              <th style="text-align:right">Usuários cadastrados</th>
+              <th style="text-align:right">% do total</th>
+            </tr></thead>
+            <tbody id="tabela-minhaBib"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MULTA SOLIDÁRIA -->
+    <div id="view-multa" class="view">
+      <div class="kpi-grid" id="kpi-multa"></div>
+      <div class="section-title">Multa Solidária — detalhamento por biblioteca</div>
+      <div id="multa-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:12px"></div>
+      <div class="section-title">Tabela consolidada — todas as bibliotecas</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Biblioteca</th>
+              <th>Instituição contemplada</th>
+              <th>CNPJ</th>
+              <th style="text-align:right">kg doados</th>
+              <th>Período de arrecadação</th>
+              <th>Data da doação</th>
+            </tr></thead>
+            <tbody id="tabela-multa"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NORMALIZAÇÃO -->
+    <div id="view-normalizacao" class="view">
+      <div class="kpi-grid" id="kpi-norm"></div>
+      <div class="section-title">Normalização — atendimentos por biblioteca</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Atendimentos presenciais</div>
+          <div class="card-sub">Por biblioteca no trimestre</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-norm-presencial" role="img" aria-label="Normalização presencial por biblioteca"></canvas></div>
+          <div class="legend" id="leg-norm-presencial"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Atendimentos online</div>
+          <div class="card-sub">Por biblioteca no trimestre</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-norm-online" role="img" aria-label="Normalização online por biblioteca"></canvas></div>
+          <div class="legend" id="leg-norm-online"></div>
+        </div>
+      </div>
+      <div class="section-title">Comparativo presencial × online — sistema</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Presencial vs. online por biblioteca</div>
+        <div class="card-sub">Barras agrupadas</div>
+        <div class="chart-wrap" style="height:280px"><canvas id="c-norm-grouped" role="img" aria-label="Normalização comparativo"></canvas></div>
+        <div class="legend" id="leg-norm-grouped"></div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Biblioteca</th>
+              <th style="text-align:right">Atend. presencial</th>
+              <th style="text-align:right">Atend. online</th>
+              <th style="text-align:right">Total</th>
+            </tr></thead>
+            <tbody id="tabela-norm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- POR BIBLIOTECA -->
+    <div id="view-detalhe" class="view">
+      <div class="detail-grid" id="detail-grid"></div>
+      <div class="section-title">Tipos de atendimento por biblioteca</div>
+      <div id="tipos-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px"></div>
+      <div class="section-title">Participação proporcional</div>
+      <div class="card">
+        <div class="card-title">Peso relativo por indicador</div>
+        <div class="card-sub">Barras normalizadas pelo maior valor</div>
+        <div id="progress-section"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const BIBLIOTECAS=[
+  {nome:'Central',  id:'1lJDi2kYWHq0-IErs3bQGsca7Mi1KWimDojgyJE7GRM0'},
+  {nome:'Setorial', id:'1WAR-aNE0K5MH6l4gZMXoFtESHUWX4xPKEaNU03ikjXU'},
+  {nome:'UAST',     id:'1VcF4O_jhCldETYQHkDLPj5TFeHhLw6_9IJdVT6xXl9s'},
+  {nome:'UACSA',    id:'1MWqWkD3gMfT4hYVf6vT-y4qGk7VaINi4VeMn7iy5t0Q'},
+  {nome:'UABJ',     id:'1U7bB4q_ZJ4ITM78YLYTvnroz9A2kRa9A93dF8gCwKw0'},
+  {nome:'CODAI',    id:'1N0cEkzuT-1fL3a7aH-bItRx5qvShe5cZkdCqurQHknQ'},
+];
+const ID_COMUT='1EiO9S5maIwEDHcVIyOo3shbem5sur2vxDDfsLRuaVUg';
+const ID_BASES='1o83fFB4iARSeirWGfLocZEHSyAmiKkLYpZGosZZAjHQ';
+const ID_MINHA_BIB='1tnkANJxt38WwQFJJUi5lWl38XpSOHcJ0Rn5NDEyNYJI';
+
+const ABAS_BIB=['Atendimento','Acervo','Circulação','Cadastros','Eventos',
+                'Conservação','Treinamentos','Depósito Legal',
+                'Multa Solidária','Normalização'];
+
+const AREAS_CDD=['000 - Generalidades','100 - Filosofia e Psicologia','200 - Religião',
+  '300 - Ciências Sociais','400 - Linguagem','500 - Ciências',
+  '600 - Tecnologia','700 - Artes','800 - Literatura e Retórica','900 - História e Geografia'];
+const AREAS_C=['000','100','200','300','400','500','600','700','800','900'];
+const CORES=['#1d4ed8','#0f766e','#854d0e','#5b21b6','#9f1239','#065f46'];
+const CORES10=['#1d4ed8','#0f766e','#854d0e','#5b21b6','#9f1239','#065f46','#0369a1','#7c3aed','#b45309','#be123c'];
+
+Chart.register(ChartDataLabels);
+let G={}, chartsAtivos={};
+
+const getTri=()=>parseInt(document.getElementById('sel-tri').value);
+const getAno=()=>parseInt(document.getElementById('sel-ano').value);
+const fmt=n=>typeof n==='number'?n.toLocaleString('pt-BR'):(n??'—');
+const limpa=s=>(s||'').replace(/^"|"$/g,'').trim();
+const semD=c=>`<tr><td colspan="${c}" style="color:var(--text3);padding:12px;text-align:center;font-size:12px">Sem dados para este período</td></tr>`;
+const parseNum=s=>{const v=parseFloat((s||'').replace(/\./g,'').replace(',','.'));return isNaN(v)?0:Math.round(v);};
+const temTri=(row,tri,ano)=>row.some(c=>c&&c.includes(`T${tri} ${ano}`));
+
+async function fetchAba(id,aba){
+  try{
+    const r=await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`);
+    if(!r.ok)return null;
+    const t=await r.text();
+    return t.trim()?parseCSV(t):null;
+  }catch(e){return null;}
+}
+
+function parseCSV(txt){
+  return txt.trim().split('\n').map(line=>{
+    const cols=[];let cur='',inQ=false;
+    for(let c of line){
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
+      else{cur+=c;}
+    }
+    cols.push(cur.trim());return cols;
+  });
+}
+
+function somaUltimaCol(rows,tri,ano){
+  if(!rows||!rows.length)return 0;
+  let soma=0,f=false;
+  for(const row of rows){
+    if(!row||row.length<2)continue;
+    if(temTri(row,tri,ano)){soma+=parseNum(row[row.length-1]);f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||!row.length)continue;
+    soma+=parseNum(row[row.length-1]);
+  }
+  return soma;
+}
+
+function linhasTipo(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<2)continue;
+    const tipo=limpa(row[0]);if(!tipo)continue;
+    if(temTri(row,tri,ano)){out.push({tipo,valor:parseNum(row[row.length-1])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const tipo=limpa(row[0]);if(tipo)out.push({tipo,valor:parseNum(row[row.length-1])});
+  }
+  return out;
+}
+
+// Acervo: col0=títulos, col1=exemplares, col2=doação, col3=área, col4+=tri
+function linhasAcervo(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<4)continue;
+    if(temTri(row,tri,ano)){
+      out.push({titulos:parseNum(row[0]),exemplares:parseNum(row[1]),doacao:limpa(row[2]),area:limpa(row[3])});f=true;
+    }
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<4)continue;
+    const t=limpa(row[0]);if(t)out.push({titulos:parseNum(row[0]),exemplares:parseNum(row[1]),doacao:limpa(row[2]),area:limpa(row[3])});
+  }
+  return out;
+}
+
+// Circulação: col0=emp, col1=dev, col2=área, col3+=tri
+function linhasCirc(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<3)continue;
+    if(temTri(row,tri,ano)){out.push({emp:parseNum(row[0]),dev:parseNum(row[1]),area:limpa(row[2])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<3)continue;
+    const a=limpa(row[2]);if(a)out.push({emp:parseNum(row[0]),dev:parseNum(row[1]),area:a});
+  }
+  return out;
+}
+
+// Conservação/Restauração: col0=área, col1=danificados, col2=restaurados, col3+=tri
+function linhasRest(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<3)continue;
+    if(temTri(row,tri,ano)){out.push({area:limpa(row[0]),dan:parseNum(row[1]),res:parseNum(row[2])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<3)continue;
+    const a=limpa(row[0]);if(a)out.push({area:a,dan:parseNum(row[1]),res:parseNum(row[2])});
+  }
+  return out;
+}
+
+// Treinamentos: col0=treinamento, col1=tipo, col2=modalidade, col3=usuários, col4+=tri
+function linhasTrein(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<4)continue;
+    if(temTri(row,tri,ano)){out.push({treinamento:limpa(row[0]),tipo:limpa(row[1]),modalidade:limpa(row[2]),usuarios:parseNum(row[3])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<4)continue;
+    const t=limpa(row[0]);if(t)out.push({treinamento:t,tipo:limpa(row[1]),modalidade:limpa(row[2]),usuarios:parseNum(row[3])});
+  }
+  return out;
+}
+
+// Depósito Legal: col0=tipo, col1=recebidos, col2=embargados, col3+=tri
+function linhasDep(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<3)continue;
+    if(temTri(row,tri,ano)){out.push({tipo:limpa(row[0]),rec:parseNum(row[1]),emb:parseNum(row[2])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<3)continue;
+    const t=limpa(row[0]);if(t)out.push({tipo:t,rec:parseNum(row[1]),emb:parseNum(row[2])});
+  }
+  return out;
+}
+
+// COMUT: col0=atend, col1=ref, col2=recup, col3=solic, col4=ext_receb, col5=ext_canc, col6+=tri
+function linhasComut(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<6)continue;
+    if(temTri(row,tri,ano)){
+      out.push({atend:parseNum(row[0]),ref:parseNum(row[1]),recup:parseNum(row[2]),
+        solic:parseNum(row[3]),extRec:parseNum(row[4]),extCan:parseNum(row[5])});f=true;
+    }
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<6)continue;
+    out.push({atend:parseNum(row[0]),ref:parseNum(row[1]),recup:parseNum(row[2]),
+      solic:parseNum(row[3]),extRec:parseNum(row[4]),extCan:parseNum(row[5])});
+  }
+  return out;
+}
+
+// Bases: col0=base, col1=acessos, col2+=tri
+function linhasBases(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  for(const row of rows){
+    if(!row||row.length<2)continue;
+    if(temTri(row,tri,ano)){out.push({base:limpa(row[0]),acessos:parseNum(row[1])});f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const b=limpa(row[0]);if(b)out.push({base:b,acessos:parseNum(row[1])});
+  }
+  return out;
+}
+
+// Minha Biblioteca: col0=Usuários cadastrados, col1=Trimestre
+function linhasMinhaBib(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  // find header row to identify column indices
+  const header=rows[0]||[];
+  const colUsuarios=header.findIndex(h=>limpa(h).toLowerCase().includes('usuário')||limpa(h).toLowerCase().includes('usuario'));
+  const colTri=header.findIndex(h=>limpa(h).toLowerCase().includes('trimestre'));
+  const idxU=colUsuarios>=0?colUsuarios:0;
+  const idxT=colTri>=0?colTri:1;
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const triLabel=limpa(row[idxT]);if(!triLabel)continue;
+    out.push({trimestre:triLabel,usuarios:parseNum(row[idxU])});
+  }
+  // If trimestre filter: try to match current selection
+  const tag=`T${tri} ${ano}`;
+  const filtered=out.filter(l=>l.trimestre.includes(tag)||l.trimestre===tag);
+  return filtered.length>0?filtered:out;
+}
+
+// Multa Solidária: col0=Instituição, col1=CNPJ, col2=kg doados, col3=período arrecadação, col4=data doação, col5=trimestre
+function linhasMulta(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const out=[];let f=false;
+  const tag=`T${tri} ${ano}`;
+  for(const row of rows){
+    if(!row||row.length<2)continue;
+    if(row.some(c=>c&&c.includes(tag))){
+      out.push({inst:limpa(row[0]),cnpj:limpa(row[1]),kg:parseNum(row[2]),periodo:limpa(row[3]),dataDoacao:limpa(row[4])});f=true;
+    }
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const v=limpa(row[0]);if(v)out.push({inst:v,cnpj:limpa(row[1]),kg:parseNum(row[2]),periodo:limpa(row[3]),dataDoacao:limpa(row[4])});
+  }
+  return out;
+}
+
+// Normalização: col0=atendimento presencial, col1=atendimento online, col2=trimestre
+function linhasNorm(rows,tri,ano){
+  if(!rows||!rows.length)return{presencial:0,online:0};
+  const tag=`T${tri} ${ano}`;
+  let presencial=0,online=0,f=false;
+  for(const row of rows){
+    if(!row||row.length<2)continue;
+    if(row.some(c=>c&&c.includes(tag))){presencial+=parseNum(row[0]);online+=parseNum(row[1]);f=true;}
+  }
+  if(!f)for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    presencial+=parseNum(row[0]);online+=parseNum(row[1]);
+  }
+  return{presencial,online};
+}
+
+function agrupaArea(linhas,campo){
+  const m={};AREAS_C.forEach(k=>{m[k]=0;});
+  for(const l of linhas){
+    const cod=(l.area||'').trim().substring(0,3);
+    if(m[cod]!==undefined){m[cod]+=l[campo]||0;}
+    else{
+      const idx=AREAS_CDD.findIndex(a=>a.toLowerCase().includes((l.area||'').toLowerCase().trim()));
+      if(idx>=0)m[AREAS_C[idx]]+=l[campo]||0;
+    }
+  }
+  return m;
+}
+
+
+// ── CARREGAMENTO ──────────────────────────────────────────────────────────────
+async function loadAll(){
+  document.getElementById('loading').style.display='flex';
+  document.getElementById('content').style.display='none';
+  document.getElementById('error-box').style.display='none';
+  const tri=getTri(),ano=getAno();
+  try{
+    // Bibliotecas
+    const resBibs=await Promise.all(BIBLIOTECAS.map(async bib=>{
+      const abas={};
+      const fs=await Promise.all(ABAS_BIB.map(a=>fetchAba(bib.id,a).then(r=>({a,r}))));
+      fs.forEach(({a,r})=>{if(r)abas[a]=r;});
+      return{nome:bib.nome,data:abas};
+    }));
+    G={};
+    resBibs.forEach(({nome,data})=>{G[nome]=data;});
+
+    // Serviços centrais
+    const [comutRows,basesRows,minhaBibRows]=await Promise.all([
+      fetchAba(ID_COMUT,'COMUT'),
+      fetchAba(ID_BASES,'Bases de Dados'),
+      fetchAba(ID_MINHA_BIB,'Minha Biblioteca'),
+    ]);
+    G._comut=comutRows||[];
+    G._bases=basesRows||[];
+    G._minhaBib=minhaBibRows||[];
+
+    renderAll(tri,ano);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('content').style.display='block';
+    document.getElementById('page-meta').textContent=`${tri}º trimestre de ${ano} · ${BIBLIOTECAS.length} bibliotecas + serviços centrais · atualizado agora`;
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('error-box').style.display='block';
+    document.getElementById('error-box').textContent=`Erro ao carregar dados: ${e.message}. Verifique se as planilhas estão públicas.`;
+  }
+}
+
+function renderAll(tri,ano){
+  const libs=BIBLIOTECAS.map(b=>b.nome);
+  const resumo=libs.map((nome,i)=>{
+    const d=G[nome]||{};
+    const acervoL=linhasAcervo(d['Acervo']||[],tri,ano);
+    const circL  =linhasCirc(d['Circulação']||[],tri,ano);
+    const restL  =linhasRest(d['Conservação']||[],tri,ano);
+    const treinL =linhasTrein(d['Treinamentos']||[],tri,ano);
+    const depL   =linhasDep(d['Depósito Legal']||[],tri,ano);
+    const multaL =linhasMulta(d['Multa Solidária']||[],tri,ano);
+    const normD  =linhasNorm(d['Normalização']||[],tri,ano);
+    return{
+      nome,cor:CORES[i],
+      atendimentos:somaUltimaCol(d['Atendimento']||[],tri,ano),
+      cadastros:   somaUltimaCol(d['Cadastros']||[],tri,ano),
+      eventos:     somaUltimaCol(d['Eventos']||[],tri,ano),
+      titulos:     acervoL.reduce((a,l)=>a+l.titulos,0),
+      exemplares:  acervoL.reduce((a,l)=>a+l.exemplares,0),
+      emp:         circL.reduce((a,l)=>a+l.emp,0),
+      dev:         circL.reduce((a,l)=>a+l.dev,0),
+      danificados: restL.reduce((a,l)=>a+l.dan,0),
+      restaurados: restL.reduce((a,l)=>a+l.res,0),
+      treinamentos:treinL.length,
+      usuariosTrein:treinL.reduce((a,l)=>a+l.usuarios,0),
+      depRec:      depL.reduce((a,l)=>a+l.rec,0),
+      depEmb:      depL.reduce((a,l)=>a+l.emb,0),
+      kgDoados:    multaL.reduce((a,l)=>a+l.kg,0),
+      normPresencial: normD.presencial,
+      normOnline:     normD.online,
+      acervoL,circL,restL,treinL,depL,multaL,normD,
+      atendL:linhasTipo(d['Atendimento']||[],tri,ano),
+    };
+  });
+
+  const comutL=linhasComut(G._comut,tri,ano);
+  const basesL=linhasBases(G._bases,tri,ano);
+  const minhaBibL=linhasMinhaBib(G._minhaBib,tri,ano);
+
+  renderKPIs(resumo,tri,ano);
+  renderNav();
+  renderGeralCharts(resumo,libs);
+  renderTabela(resumo);
+  renderAcervo(resumo);
+  renderCirculacao(resumo);
+  renderRestauracao(resumo);
+  renderTreinamentos(resumo,libs);
+  renderDeposito(resumo);
+  renderComut(comutL,tri,ano);
+  renderBases(basesL);
+  renderMinhaBib(minhaBibL,tri,ano);
+  renderMulta(resumo);
+  renderNorm(resumo);
+  renderDetalhe(resumo);
+  renderTipos(resumo);
+  renderProgress(resumo);
+}
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+function renderKPIs(resumo,tri,ano){
+  const s=k=>resumo.reduce((a,b)=>a+(b[k]||0),0);
+  const kpis=[
+    {key:'emp',label:'Empréstimos',cor:'#1d4ed8',bg:'#eff4ff'},
+    {key:'dev',label:'Devoluções',cor:'#0f766e',bg:'#f0fdf9'},
+    {key:'titulos',label:'Títulos',cor:'#5b21b6',bg:'#f5f3ff'},
+    {key:'exemplares',label:'Exemplares',cor:'#854d0e',bg:'#fef3c7'},
+    {key:'atendimentos',label:'Atendimentos',cor:'#9f1239',bg:'#fff1f2'},
+    {key:'eventos',label:'Eventos',cor:'#065f46',bg:'#ecfdf5'},
+  ];
+  document.getElementById('kpi-grid').innerHTML=kpis.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:${k.bg}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${k.cor}" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" style="color:${k.cor}">${fmt(s(k.key))}</div>
+      <div class="kpi-sub">${BIBLIOTECAS.length} bibs · ${tri}º tri ${ano}</div>
+    </div>`).join('');
+}
+
+function renderNav(){
+  document.getElementById('lib-nav').innerHTML=BIBLIOTECAS.map((b,i)=>
+    `<div class="nav-item" style="font-size:12px"><span class="nav-dot" style="background:${CORES[i]}"></span>${b.nome}</div>`
+  ).join('');
+}
+
+// ── CHART HELPERS ─────────────────────────────────────────────────────────────
+const DL={anchor:'end',align:'end',offset:2,color:'#6b6860',font:{size:11,family:'DM Mono',weight:'500'},formatter:v=>v>0?v.toLocaleString('pt-BR'):''};
+
+function mkBar(id,labels,data,color){
+  if(chartsAtivos[id])chartsAtivos[id].destroy();
+  chartsAtivos[id]=new Chart(document.getElementById(id),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:color,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},datalabels:DL},
+      scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11,family:'DM Mono'}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+}
+
+function mkDonut(id,labels,data,colors){
+  if(chartsAtivos[id])chartsAtivos[id].destroy();
+  chartsAtivos[id]=new Chart(document.getElementById(id),{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:3,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},datalabels:{display:false}}}
+  });
+}
+
+function mkGrouped(id,labels,datasets){
+  if(chartsAtivos[id])chartsAtivos[id].destroy();
+  chartsAtivos[id]=new Chart(document.getElementById(id),{
+    type:'bar',
+    data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',offset:1,color:'#6b6860',font:{size:10,family:'DM Mono'},formatter:v=>v>0?fmt(v):''}},
+      scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11,family:'DM Mono'}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+}
+
+function areaLabel(k){
+  const full=AREAS_CDD.find(a=>a.startsWith(k));
+  return full?full.split(' - ')[1]||k:k;
+}
+
+// ── GERAL ─────────────────────────────────────────────────────────────────────
+function renderGeralCharts(resumo,libs){
+  mkBar('c-emp',libs,resumo.map(r=>r.emp),CORES);
+  mkBar('c-titulos',libs,resumo.map(r=>r.titulos),'#5b21b6');
+  mkBar('c-exemplares',libs,resumo.map(r=>r.exemplares),'#854d0e');
+  mkBar('c-evt',libs,resumo.map(r=>r.eventos),'#065f46');
+  mkBar('c-atend-bar',libs,resumo.map(r=>r.atendimentos),'#9f1239');
+  mkBar('c-trein-bar',libs,resumo.map(r=>r.usuariosTrein),'#0369a1');
+  const tot=resumo.reduce((a,b)=>a+b.emp,0);
+  mkDonut('c-pizza',libs,resumo.map(r=>r.emp),CORES);
+  document.getElementById('leg-pizza').innerHTML=libs.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES[i]}"></span>${l} ${tot>0?Math.round(resumo[i].emp/tot*100):0}%</span>`).join('');
+}
+
+function renderTabela(resumo){
+  const max=k=>Math.max(...resumo.map(r=>r[k]),1);
+  document.getElementById('tabela').innerHTML=resumo.map((r,i)=>{
+    const score=(r.emp/max('emp')+r.titulos/max('titulos')+r.eventos/max('eventos'))/3;
+    const[bc,bl]=score>=.7?['badge-green','Destaque']:score>=.4?['badge-blue','Regular']:['badge-amber','Atenção'];
+    return`<tr>
+      <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
+      <td class="num">${fmt(r.atendimentos)}</td><td class="num">${fmt(r.emp)}</td>
+      <td class="num">${fmt(r.dev)}</td><td class="num">${fmt(r.titulos)}</td>
+      <td class="num">${fmt(r.exemplares)}</td>
+      <td class="num">${fmt(r.usuariosTrein)}</td><td class="num">${fmt(r.eventos)}</td>
+      <td><span class="badge ${bc}">${bl}</span></td></tr>`;
+  }).join('');
+}
+
+// ── ACERVO ────────────────────────────────────────────────────────────────────
+function renderAcervo(resumo){
+  const aT={},aE={};AREAS_C.forEach(k=>{aT[k]=0;aE[k]=0;});
+  resumo.forEach(r=>{
+    const mt=agrupaArea(r.acervoL,'titulos');
+    const me=agrupaArea(r.acervoL,'exemplares');
+    AREAS_C.forEach(k=>{aT[k]+=mt[k];aE[k]+=me[k];});
+  });
+  mkDonut('c-area-titulos',AREAS_C,AREAS_C.map(k=>aT[k]),CORES10);
+  mkDonut('c-area-exemplares',AREAS_C,AREAS_C.map(k=>aE[k]),CORES10);
+  const totT=AREAS_C.reduce((a,k)=>a+aT[k],0),totE=AREAS_C.reduce((a,k)=>a+aE[k],0);
+  document.getElementById('leg-area-titulos').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${totT>0?Math.round(aT[k]/totT*100):0}%</span>`).join('');
+  document.getElementById('leg-area-exemplares').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${totE>0?Math.round(aE[k]/totE*100):0}%</span>`).join('');
+
+  document.getElementById('acervo-grid').innerHTML=resumo.map((r,i)=>{
+    const mt=agrupaArea(r.acervoL,'titulos'),me=agrupaArea(r.acervoL,'exemplares');
+    const linhas=AREAS_C.map(k=>({area:k,t:mt[k],e:me[k]})).filter(l=>l.t>0||l.e>0);
+    const aHTML=linhas.length===0?semD(3):linhas.map(l=>
+      `<tr><td><span class="area-chip">${l.area}</span>${areaLabel(l.area)}</td><td class="num">${fmt(l.t)}</td><td class="num">${fmt(l.e)}</td></tr>`).join('');
+    const dMap={};r.acervoL.forEach(l=>{if(l.doacao)dMap[l.doacao]=(dMap[l.doacao]||0)+l.titulos;});
+    const dHTML=Object.keys(dMap).length===0?semD(2):
+      Object.entries(dMap).sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<tr><td>${t}</td><td class="num">${fmt(v)}</td></tr>`).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.titulos)} títulos · ${fmt(r.exemplares)} ex.</span>
+      </div>
+      <div class="sub-tab-bar">
+        <div class="sub-tab active" onclick="subTab(this,'ac${i}','area')">Por área</div>
+        <div class="sub-tab" onclick="subTab(this,'ac${i}','doacao')">Tipo de doação</div>
+      </div>
+      <div id="ac${i}-area" class="sub-panel active">
+        <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Títulos</th><th style="text-align:right">Exemplares</th></tr></thead><tbody>${aHTML}</tbody></table>
+      </div>
+      <div id="ac${i}-doacao" class="sub-panel">
+        <table class="dt"><thead><tr><th>Tipo de doação</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${dHTML}</tbody></table>
+      </div>
+    </div>`;
+  }).join('');
+
+  const dTot={};resumo.forEach(r=>r.acervoL.forEach(l=>{if(l.doacao)dTot[l.doacao]=(dTot[l.doacao]||0)+l.titulos;}));
+  const dtL=Object.keys(dTot),dtV=dtL.map(k=>dTot[k]);
+  mkDonut('c-doacao',dtL,dtV,CORES10);
+  const dtTotal=dtV.reduce((a,b)=>a+b,0);
+  document.getElementById('leg-doacao').innerHTML=dtL.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${dtTotal>0?Math.round(dtV[i]/dtTotal*100):0}%</span>`).join('');
+
+  const allTipos=[...new Set(resumo.flatMap(r=>r.acervoL.map(l=>l.doacao).filter(Boolean)))];
+  let ph='';
+  allTipos.forEach(tipo=>{
+    const vals=resumo.map(r=>r.acervoL.filter(l=>l.doacao===tipo).reduce((a,l)=>a+l.titulos,0));
+    const mx=Math.max(...vals,1);
+    ph+=`<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">${tipo}</div>`;
+    resumo.forEach((r,i)=>{ph+=`<div class="progress-row"><div class="progress-label">${r.nome}</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.round(vals[i]/mx*100)}%;background:${CORES[i]}"></div></div>
+      <div class="progress-val">${fmt(vals[i])}</div></div>`;});
+    ph+='</div>';
+  });
+  document.getElementById('doacao-progress').innerHTML=ph||`<p style="font-size:13px;color:var(--text3);padding:12px 0">Sem dados de doação.</p>`;
+}
+
+// ── CIRCULAÇÃO ────────────────────────────────────────────────────────────────
+function renderCirculacao(resumo){
+  const eA={},dA={};AREAS_C.forEach(k=>{eA[k]=0;dA[k]=0;});
+  resumo.forEach(r=>{
+    const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
+    AREAS_C.forEach(k=>{eA[k]+=me[k];dA[k]+=md[k];});
+  });
+  mkDonut('c-circ-emp',AREAS_C,AREAS_C.map(k=>eA[k]),CORES10);
+  mkDonut('c-circ-dev',AREAS_C,AREAS_C.map(k=>dA[k]),CORES10);
+  const tE=AREAS_C.reduce((a,k)=>a+eA[k],0),tD=AREAS_C.reduce((a,k)=>a+dA[k],0);
+  document.getElementById('leg-circ-emp').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tE>0?Math.round(eA[k]/tE*100):0}%</span>`).join('');
+  document.getElementById('leg-circ-dev').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tD>0?Math.round(dA[k]/tD*100):0}%</span>`).join('');
+  mkGrouped('c-circ-grouped',AREAS_C,[
+    {label:'Empréstimos',data:AREAS_C.map(k=>eA[k]),backgroundColor:'#1d4ed8',borderRadius:4,borderSkipped:false},
+    {label:'Devoluções', data:AREAS_C.map(k=>dA[k]),backgroundColor:'#0f766e',borderRadius:4,borderSkipped:false},
+  ]);
+  document.getElementById('leg-circ-grouped').innerHTML=
+    `<span><span class="leg-sq" style="background:#1d4ed8"></span>Empréstimos</span>
+     <span><span class="leg-sq" style="background:#0f766e"></span>Devoluções</span>`;
+  document.getElementById('leg-circ-areas').innerHTML=
+    AREAS_C.map((k,i)=>`<span><span class="leg-sq" style="background:${CORES10[i]};border-radius:2px"></span>${k} — ${(AREAS_CDD[i]||'').replace(/^\d+ - /,'')}</span>`).join('');
+  document.getElementById('circ-grid').innerHTML=resumo.map((r,i)=>{
+    const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
+    const linhas=AREAS_C.map(k=>({area:k,emp:me[k],dev:md[k]})).filter(l=>l.emp>0||l.dev>0);
+    const rows=linhas.length===0?semD(4):linhas.map(l=>{
+      const s=l.emp-l.dev;
+      return`<tr><td><span class="area-chip">${l.area}</span>${areaLabel(l.area)}</td>
+        <td class="num">${fmt(l.emp)}</td><td class="num">${fmt(l.dev)}</td>
+        <td class="num" style="color:${s>=0?'var(--teal)':'var(--rose)'}">${s>=0?'+':''}${fmt(s)}</td></tr>`;}).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.emp)} emp · ${fmt(r.dev)} dev</span>
+      </div>
+      <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Empréstimos</th><th style="text-align:right">Devoluções</th><th style="text-align:right">Saldo</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;}).join('');
+}
+
+// ── RESTAURAÇÃO ───────────────────────────────────────────────────────────────
+function renderRestauracao(resumo){
+  const totDan=resumo.reduce((a,r)=>a+r.danificados,0);
+  const totRes=resumo.reduce((a,r)=>a+r.restaurados,0);
+  document.getElementById('kpi-rest').innerHTML=[
+    {label:'Materiais danificados',val:totDan,cor:'#9f1239',bg:'#fff1f2'},
+    {label:'Materiais restaurados',val:totRes,cor:'#0f766e',bg:'#f0fdf9'},
+    {label:'Taxa de restauração',val:totDan>0?Math.round(totRes/totDan*100)+'%':'-',cor:'#5b21b6',bg:'#f5f3ff'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${typeof k.val==='number'?fmt(k.val):k.val}</div></div>`).join('');
+
+  const rDan={},rRes={};AREAS_C.forEach(k=>{rDan[k]=0;rRes[k]=0;});
+  resumo.forEach(r=>{
+    const md=agrupaArea(r.restL,'dan'),mr=agrupaArea(r.restL,'res');
+    AREAS_C.forEach(k=>{rDan[k]+=md[k];rRes[k]+=mr[k];});
+  });
+  mkDonut('c-rest-dan',AREAS_C,AREAS_C.map(k=>rDan[k]),CORES10);
+  mkDonut('c-rest-res',AREAS_C,AREAS_C.map(k=>rRes[k]),CORES10);
+  const tD=AREAS_C.reduce((a,k)=>a+rDan[k],0),tR=AREAS_C.reduce((a,k)=>a+rRes[k],0);
+  document.getElementById('leg-rest-dan').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tD>0?Math.round(rDan[k]/tD*100):0}%</span>`).join('');
+  document.getElementById('leg-rest-res').innerHTML=AREAS_C.map((k,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tR>0?Math.round(rRes[k]/tR*100):0}%</span>`).join('');
+
+  document.getElementById('rest-grid').innerHTML=resumo.map((r,i)=>{
+    const linhas=r.restL.filter(l=>l.dan>0||l.res>0);
+    const rows=linhas.length===0?semD(4):linhas.map(l=>{
+      const tx=l.dan>0?Math.round(l.res/l.dan*100):0;
+      return`<tr><td><span class="area-chip">${(l.area||'').substring(0,3)}</span>${l.area}</td>
+        <td class="num">${fmt(l.dan)}</td><td class="num">${fmt(l.res)}</td>
+        <td class="num">${tx}%</td></tr>`;}).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.danificados)} dan. · ${fmt(r.restaurados)} rest.</span>
+      </div>
+      <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Danificados</th><th style="text-align:right">Restaurados</th><th style="text-align:right">Taxa</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;}).join('');
+}
+
+// ── TREINAMENTOS ──────────────────────────────────────────────────────────────
+function renderTreinamentos(resumo,libs){
+  const totTrein=resumo.reduce((a,r)=>a+r.treinamentos,0);
+  const totUsr  =resumo.reduce((a,r)=>a+r.usuariosTrein,0);
+  const modalMap={};
+  resumo.forEach(r=>r.treinL.forEach(l=>{if(l.modalidade)modalMap[l.modalidade]=(modalMap[l.modalidade]||0)+l.usuarios;}));
+  document.getElementById('kpi-trein').innerHTML=[
+    {label:'Treinamentos realizados',val:totTrein,cor:'#0369a1',bg:'#e0f2fe'},
+    {label:'Usuários treinados',val:totUsr,cor:'#5b21b6',bg:'#f5f3ff'},
+    {label:'Modalidades',val:Object.keys(modalMap).length,cor:'#065f46',bg:'#ecfdf5'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  mkBar('c-trein-lib',libs,resumo.map(r=>r.usuariosTrein),CORES);
+  const mL=Object.keys(modalMap),mV=mL.map(k=>modalMap[k]);
+  mkDonut('c-trein-mod',mL,mV,CORES10);
+  const mTot=mV.reduce((a,b)=>a+b,0);
+  document.getElementById('leg-trein-mod').innerHTML=mL.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${mTot>0?Math.round(mV[i]/mTot*100):0}%</span>`).join('');
+
+  document.getElementById('trein-grid').innerHTML=resumo.map((r,i)=>{
+    const rows=r.treinL.length===0?semD(5):r.treinL.map(l=>
+      `<tr><td>${l.treinamento}</td>
+       <td><span class="badge badge-blue">${l.tipo}</span></td>
+       <td><span class="badge badge-teal">${l.modalidade}</span></td>
+       <td class="num">${fmt(l.usuarios)}</td></tr>`).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${r.treinamentos} trein. · ${fmt(r.usuariosTrein)} usuários</span>
+      </div>
+      <table class="dt"><thead><tr><th>Treinamento</th><th>Tipo</th><th>Modalidade</th><th style="text-align:right">Usuários</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;}).join('');
+}
+
+// ── DEPÓSITO LEGAL ────────────────────────────────────────────────────────────
+function renderDeposito(resumo){
+  const totRec=resumo.reduce((a,r)=>a+r.depRec,0);
+  const totEmb=resumo.reduce((a,r)=>a+r.depEmb,0);
+  document.getElementById('kpi-dep').innerHTML=[
+    {label:'Trabalhos recebidos',val:totRec,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Trabalhos embargados',val:totEmb,cor:'#9f1239',bg:'#fff1f2'},
+    {label:'Disponíveis',val:totRec-totEmb,cor:'#065f46',bg:'#ecfdf5'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  // Agrega tipos sistema
+  const tipoMap={};
+  resumo.forEach(r=>r.depL.forEach(l=>{
+    if(!tipoMap[l.tipo])tipoMap[l.tipo]={rec:0,emb:0};
+    tipoMap[l.tipo].rec+=l.rec;tipoMap[l.tipo].emb+=l.emb;
+  }));
+  const tLabels=Object.keys(tipoMap);
+  mkGrouped('c-dep-grouped',tLabels,[
+    {label:'Recebidos', data:tLabels.map(k=>tipoMap[k].rec),backgroundColor:'#1d4ed8',borderRadius:4,borderSkipped:false},
+    {label:'Embargados',data:tLabels.map(k=>tipoMap[k].emb),backgroundColor:'#9f1239',borderRadius:4,borderSkipped:false},
+  ]);
+  document.getElementById('leg-dep-grouped').innerHTML=
+    `<span><span class="leg-sq" style="background:#1d4ed8"></span>Recebidos</span>
+     <span><span class="leg-sq" style="background:#9f1239"></span>Embargados</span>`;
+  mkDonut('c-dep-pizza',tLabels,tLabels.map(k=>tipoMap[k].rec),CORES10);
+  const pTot=tLabels.reduce((a,k)=>a+tipoMap[k].rec,0);
+  document.getElementById('leg-dep-pizza').innerHTML=tLabels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${pTot>0?Math.round(tipoMap[l].rec/pTot*100):0}%</span>`).join('');
+
+  document.getElementById('dep-grid').innerHTML=resumo.map((r,i)=>{
+    const rows=r.depL.length===0?semD(4):r.depL.map(l=>
+      `<tr><td>${l.tipo}</td><td class="num">${fmt(l.rec)}</td><td class="num">${fmt(l.emb)}</td>
+       <td class="num">${fmt(l.rec-l.emb)}</td></tr>`).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.depRec)} rec. · ${fmt(r.depEmb)} emb.</span>
+      </div>
+      <table class="dt"><thead><tr><th>Tipo</th><th style="text-align:right">Recebidos</th><th style="text-align:right">Embargados</th><th style="text-align:right">Disponíveis</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;}).join('');
+}
+
+// ── COMUT ─────────────────────────────────────────────────────────────────────
+function renderComut(linhas,tri,ano){
+  const soma=k=>linhas.reduce((a,l)=>a+(l[k]||0),0);
+  document.getElementById('kpi-comut').innerHTML=[
+    {label:'Atendimentos',     val:soma('atend'),  cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Ref. pesquisadas', val:soma('ref'),    cor:'#5b21b6',bg:'#f5f3ff'},
+    {label:'Trab. solicitados',val:soma('solic'),  cor:'#854d0e',bg:'#fef3c7'},
+    {label:'Trab. recuperados',val:soma('recup'),  cor:'#065f46',bg:'#ecfdf5'},
+    {label:'Sol. ext. recebidas/atend.',val:soma('extRec'),cor:'#0f766e',bg:'#f0fdf9'},
+    {label:'Sol. ext. canc./repass.',   val:soma('extCan'),cor:'#9f1239',bg:'#fff1f2'},
+  ].map(k=>`<div class="kpi-card">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div>
+  </div>`).join('');
+
+  const labels=['Atend.','Ref. pesq.','Trab. solic.','Trab. recup.'];
+  const vals=[soma('atend'),soma('ref'),soma('solic'),soma('recup')];
+  mkGrouped('c-comut-trab',['Solicitados','Recuperados'],[
+    {label:'Solicitados', data:[soma('solic'),0],backgroundColor:'#854d0e',borderRadius:4,borderSkipped:false},
+    {label:'Recuperados', data:[0,soma('recup')],backgroundColor:'#065f46',borderRadius:4,borderSkipped:false},
+  ]);
+  document.getElementById('leg-comut-trab').innerHTML=
+    `<span><span class="leg-sq" style="background:#854d0e"></span>Solicitados</span>
+     <span><span class="leg-sq" style="background:#065f46"></span>Recuperados</span>`;
+  mkGrouped('c-comut-ext',['Recebidas/atend.','Canc./repass.'],[
+    {label:'Recebidas/atend.',data:[soma('extRec'),0],backgroundColor:'#0f766e',borderRadius:4,borderSkipped:false},
+    {label:'Canc./repass.',   data:[0,soma('extCan')],backgroundColor:'#9f1239',borderRadius:4,borderSkipped:false},
+  ]);
+  document.getElementById('leg-comut-ext').innerHTML=
+    `<span><span class="leg-sq" style="background:#0f766e"></span>Recebidas/atendidas</span>
+     <span><span class="leg-sq" style="background:#9f1239"></span>Canceladas/repassadas</span>`;
+
+  document.getElementById('tabela-comut').innerHTML=linhas.length===0?semD(7):
+    linhas.map(l=>`<tr>
+      <td>${getTri()}º tri ${getAno()}</td>
+      <td class="num">${fmt(l.atend)}</td><td class="num">${fmt(l.ref)}</td>
+      <td class="num">${fmt(l.solic)}</td><td class="num">${fmt(l.recup)}</td>
+      <td class="num">${fmt(l.extRec)}</td><td class="num">${fmt(l.extCan)}</td>
+    </tr>`).join('');
+}
+
+// ── MINHA BIBLIOTECA ─────────────────────────────────────────────────────────
+function renderMinhaBib(linhas,tri,ano){
+  const total=linhas.reduce((a,l)=>a+l.usuarios,0);
+  const atual=linhas.find(l=>l.trimestre.includes(`T${tri} ${ano}`));
+  document.getElementById('kpi-minhaBib').innerHTML=[
+    {label:'Usuários cadastrados (período)',val:total,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Registros encontrados',val:linhas.length,cor:'#065f46',bg:'#ecfdf5'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  const labels=linhas.map(l=>l.trimestre);
+  const vals=linhas.map(l=>l.usuarios);
+  mkBar('c-minhaBib-bar',labels,vals,CORES10.slice(0,labels.length));
+  mkDonut('c-minhaBib-pizza',labels,vals,CORES10);
+  document.getElementById('leg-minhaBib-pizza').innerHTML=labels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${total>0?Math.round(vals[i]/total*100):0}%</span>`).join('');
+
+  document.getElementById('tabela-minhaBib').innerHTML=linhas.length===0?semD(3):
+    linhas.map(l=>`<tr>
+      <td>${l.trimestre}</td>
+      <td class="num">${fmt(l.usuarios)}</td>
+      <td class="pct">${total>0?Math.round(l.usuarios/total*100):0}%</td>
+    </tr>`).join('');
+}
+
+// ── BASES DE DADOS ────────────────────────────────────────────────────────────
+function renderBases(linhas){
+  const total=linhas.reduce((a,l)=>a+l.acessos,0);
+  document.getElementById('kpi-bases').innerHTML=[
+    {label:'Total de acessos',val:total,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Bases ativas',val:linhas.length,cor:'#065f46',bg:'#ecfdf5'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  const labels=linhas.map(l=>l.base),vals=linhas.map(l=>l.acessos);
+  mkBar('c-bases-bar',labels,vals,CORES10.slice(0,labels.length));
+  mkDonut('c-bases-pizza',labels,vals,CORES10);
+  document.getElementById('leg-bases-pizza').innerHTML=labels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${total>0?Math.round(vals[i]/total*100):0}%</span>`).join('');
+
+  document.getElementById('tabela-bases').innerHTML=linhas.length===0?semD(3):
+    [...linhas].sort((a,b)=>b.acessos-a.acessos).map(l=>`<tr>
+      <td>${l.base}</td>
+      <td class="num">${fmt(l.acessos)}</td>
+      <td class="pct">${total>0?Math.round(l.acessos/total*100):0}%</td>
+    </tr>`).join('');
+}
+
+// ── MULTA SOLIDÁRIA ───────────────────────────────────────────────────────────
+function renderMulta(resumo){
+  const totKg=resumo.reduce((a,r)=>a+(r.kgDoados||0),0);
+  const totInst=resumo.reduce((a,r)=>a+(r.multaL||[]).length,0);
+  document.getElementById('kpi-multa').innerHTML=[
+    {label:'Total de kg doados',val:totKg,cor:'#065f46',bg:'#ecfdf5'},
+    {label:'Instituições contempladas',val:totInst,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Bibliotecas participantes',val:resumo.filter(r=>(r.kgDoados||0)>0).length,cor:'#5b21b6',bg:'#f5f3ff'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  document.getElementById('multa-grid').innerHTML=resumo.map((r,i)=>{
+    const lista=r.multaL||[];
+    const kg=(r.kgDoados||0);
+    let bodyHTML;
+    if(lista.length===0){
+      bodyHTML=`<tr><td colspan="5" style="color:var(--text3);padding:16px;text-align:center;font-size:12px">Sem dados para este período</td></tr>`;
+    } else {
+      bodyHTML=lista.map(l=>`<tr>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${l.inst||''}">${l.inst||'—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap">${l.cnpj||'—'}</td>
+        <td class="num">${fmt(l.kg)}</td>
+        <td style="white-space:nowrap">${l.periodo||'—'}</td>
+        <td style="white-space:nowrap">${l.dataDoacao||'—'}</td>
+      </tr>`).join('');
+    }
+    return`<div class="card" style="min-height:120px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${r.cor};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(kg)} kg doados</span>
+      </div>
+      <div class="table-wrap">
+        <table class="dt" style="min-width:480px"><thead><tr>
+          <th>Instituição</th><th>CNPJ</th><th style="text-align:right">kg</th><th>Período</th><th>Data doação</th>
+        </tr></thead><tbody>${bodyHTML}</tbody></table>
+      </div></div>`;
+  }).join('');
+
+  document.getElementById('tabela-multa').innerHTML=resumo.flatMap((r,i)=>
+    (r.multaL||[]).length===0?[`<tr><td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td><td colspan="5" style="color:var(--text3);font-size:12px">Sem dados neste período</td></tr>`]:
+    (r.multaL||[]).map(l=>`<tr>
+      <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
+      <td>${l.inst||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${l.cnpj||'—'}</td>
+      <td class="num">${fmt(l.kg)}</td>
+      <td>${l.periodo||'—'}</td>
+      <td>${l.dataDoacao||'—'}</td>
+    </tr>`)
+  ).join('');
+}
+
+// ── NORMALIZAÇÃO ──────────────────────────────────────────────────────────────
+function renderNorm(resumo){
+  const totP=resumo.reduce((a,r)=>a+(r.normPresencial||0),0);
+  const totO=resumo.reduce((a,r)=>a+(r.normOnline||0),0);
+  document.getElementById('kpi-norm').innerHTML=[
+    {label:'Atend. presenciais (sistema)',val:totP,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Atend. online (sistema)',val:totO,cor:'#0f766e',bg:'#f0fdf9'},
+    {label:'Total de atendimentos',val:totP+totO,cor:'#5b21b6',bg:'#f5f3ff'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+
+  const libs=resumo.map(r=>r.nome);
+  const coresLibs=resumo.map(r=>r.cor);
+  mkBar('c-norm-presencial',libs,resumo.map(r=>r.normPresencial||0),coresLibs);
+  mkBar('c-norm-online',libs,resumo.map(r=>r.normOnline||0),coresLibs);
+  const legLibs=resumo.map((r,i)=>`<span><span class="leg-sq" style="background:${r.cor}"></span>${r.nome}</span>`).join('');
+  document.getElementById('leg-norm-presencial').innerHTML=legLibs;
+  document.getElementById('leg-norm-online').innerHTML=legLibs;
+  mkGrouped('c-norm-grouped',libs,[
+    {label:'Presencial',data:resumo.map(r=>r.normPresencial||0),backgroundColor:coresLibs,borderRadius:4,borderSkipped:false},
+    {label:'Online',    data:resumo.map(r=>r.normOnline||0),    backgroundColor:coresLibs.map(c=>c+'99'),borderRadius:4,borderSkipped:false},
+  ]);
+  document.getElementById('leg-norm-grouped').innerHTML=
+    resumo.map((r,i)=>`<span><span class="leg-sq" style="background:${r.cor}"></span>${r.nome} <span style="color:var(--text3);font-size:10px">(presencial/online)</span></span>`).join('');
+
+  document.getElementById('tabela-norm').innerHTML=resumo.map((r,i)=>{
+    const total=(r.normPresencial||0)+(r.normOnline||0);
+    return`<tr>
+      <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
+      <td class="num">${fmt(r.normPresencial||0)}</td>
+      <td class="num">${fmt(r.normOnline||0)}</td>
+      <td class="num" style="font-weight:600">${fmt(total)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── POR BIBLIOTECA ────────────────────────────────────────────────────────────
+function renderDetalhe(resumo){
+  document.getElementById('detail-grid').innerHTML=resumo.map((r,i)=>`
+    <div class="detail-card">
+      <div class="detail-header">
+        <span class="lib-pip" style="background:${r.cor};width:10px;height:10px;border-radius:50%"></span>
+        <div class="detail-name">Biblioteca ${r.nome}</div>
+      </div>
+      <div class="detail-stats">
+        <div class="detail-stat"><div class="detail-stat-label">Empréstimos</div><div class="detail-stat-value" style="color:#1d4ed8">${fmt(r.emp)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Devoluções</div><div class="detail-stat-value" style="color:#0f766e">${fmt(r.dev)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Títulos</div><div class="detail-stat-value" style="color:#5b21b6">${fmt(r.titulos)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Exemplares</div><div class="detail-stat-value" style="color:#854d0e">${fmt(r.exemplares)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Atendimentos</div><div class="detail-stat-value" style="color:#9f1239">${fmt(r.atendimentos)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Eventos</div><div class="detail-stat-value" style="color:#065f46">${fmt(r.eventos)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Usuários treinados</div><div class="detail-stat-value" style="color:#0369a1">${fmt(r.usuariosTrein)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Dep. legal recebidos</div><div class="detail-stat-value" style="color:#7c3aed">${fmt(r.depRec)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Multa solidária (kg)</div><div class="detail-stat-value" style="color:#065f46">${fmt(r.kgDoados||0)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Norm. presencial</div><div class="detail-stat-value" style="color:#0369a1">${fmt(r.normPresencial||0)}</div></div>
+        <div class="detail-stat"><div class="detail-stat-label">Norm. online</div><div class="detail-stat-value" style="color:#b45309">${fmt(r.normOnline||0)}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTipos(resumo){
+  document.getElementById('tipos-grid').innerHTML=resumo.map((r,i)=>{
+    const total=r.atendL.reduce((a,b)=>a+b.valor,0);
+    const rows=r.atendL.length===0?semD(3):r.atendL.map(l=>{
+      const pct=total>0?Math.round(l.valor/total*100):0;
+      return`<tr><td>${l.tipo}</td><td class="num">${fmt(l.valor)}</td><td class="pct">${pct}%</td></tr>`;}).join('');
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600">${r.nome}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3)">Total: ${fmt(total)}</span>
+      </div>
+      <table class="dt"><thead><tr><th>Tipo de atendimento</th><th style="text-align:right">Qtd.</th><th style="text-align:right">%</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;}).join('');
+}
+
+function renderProgress(resumo){
+  const inds=[
+    {key:'emp',label:'Empréstimos',cor:'#1d4ed8'},
+    {key:'dev',label:'Devoluções',cor:'#0f766e'},
+    {key:'titulos',label:'Títulos',cor:'#5b21b6'},
+    {key:'atendimentos',label:'Atendimentos',cor:'#9f1239'},
+    {key:'usuariosTrein',label:'Usuários treinados',cor:'#0369a1'},
+  ];
+  let html='';
+  inds.forEach(ind=>{
+    const vals=resumo.map(r=>r[ind.key]);
+    const mx=Math.max(...vals,1);
+    html+=`<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">${ind.label}</div>`;
+    resumo.forEach((r,i)=>{html+=`<div class="progress-row"><div class="progress-label">${r.nome}</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.round(r[ind.key]/mx*100)}%;background:${ind.cor}"></div></div>
+      <div class="progress-val">${fmt(r[ind.key])}</div></div>`;});
+    html+='</div>';
+  });
+  document.getElementById('progress-section').innerHTML=html;
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────────
+const TAB_MAP={geral:'geral',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'minha biblioteca',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
+function setTab(v,el){
+  document.querySelectorAll('.tab,.nav-item').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const key=TAB_MAP[v]||v;
+  document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.trim().toLowerCase().includes(key))t.classList.add('active');});
+  document.querySelectorAll('.nav-item').forEach(t=>{if(t.textContent.trim().toLowerCase().includes(key))t.classList.add('active');});
+  if(el)el.classList.add('active');
+}
+
+function subTab(el,prefix,panel){
+  const card=el.closest('.card');
+  card.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  card.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(`${prefix}-${panel}`).classList.add('active');
+}
+
+// ── INÍCIO ────────────────────────────────────────────────────────────────────
+const anoAtual=new Date().getFullYear();
+const selAno=document.getElementById('sel-ano');
+[anoAtual-1,anoAtual].forEach(a=>{
+  const opt=document.createElement('option');
+  opt.value=a;opt.textContent=a;
+  if(a===anoAtual)opt.selected=true;
+  selAno.appendChild(opt);
+});
+loadAll();
+</script>
+</body>
+</html>
