@@ -136,6 +136,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="nav-item active" onclick="setTab('geral',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Visão geral
     </div>
+    <div class="nav-item" onclick="setTab('atendimento',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"/><path d="M8 9h8M8 13h5"/></svg>Atendimento
+    </div>
     <div class="nav-item" onclick="setTab('acervo',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Acervo
     </div>
@@ -170,7 +173,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Bases de dados
     </div>
     <div class="nav-item" onclick="setTab('minhaBib',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Minha Biblioteca
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Biblioteca digital
+    </div>
+    <div class="nav-item" onclick="setTab('catalogacao',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M8 2h8a2 2 0 012 2v18H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2H8z"/><path d="M9 7h6M9 11h6"/></svg>Catalogação
     </div>
   </div>
   <div class="sidebar-section" style="margin-top:8px">
@@ -193,9 +199,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="controls">
       <div class="select-wrap">
         <select id="sel-tri" onchange="loadAll()">
-          <option value="1">1º trimestre</option>
+          <option value="1" selected>1º trimestre</option>
           <option value="2">2º trimestre</option>
-          <option value="3" selected>3º trimestre</option>
+          <option value="3">3º trimestre</option>
           <option value="4">4º trimestre</option>
         </select>
       </div>
@@ -216,6 +222,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div id="content" style="display:none">
     <div class="tab-bar">
       <div class="tab active" onclick="setTab('geral',this)">Visão geral</div>
+      <div class="tab" onclick="setTab('atendimento',this)">Atendimento</div>
       <div class="tab" onclick="setTab('acervo',this)">Acervo</div>
       <div class="tab" onclick="setTab('circulacao',this)">Circulação</div>
       <div class="tab" onclick="setTab('restauracao',this)">Restauração</div>
@@ -223,7 +230,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="tab" onclick="setTab('deposito',this)">Depósito legal</div>
       <div class="tab" onclick="setTab('comut',this)">COMUT</div>
       <div class="tab" onclick="setTab('bases',this)">Bases de dados</div>
-      <div class="tab" onclick="setTab('minhaBib',this)">Minha Biblioteca</div>
+      <div class="tab" onclick="setTab('minhaBib',this)">Biblioteca digital</div>
+      <div class="tab" onclick="setTab('catalogacao',this)">Catalogação</div>
       <div class="tab" onclick="setTab('multa',this)">Multa Solidária</div>
       <div class="tab" onclick="setTab('normalizacao',this)">Normalização</div>
       <div class="tab" onclick="setTab('detalhe',this)">Por biblioteca</div>
@@ -260,12 +268,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
       </div>
       <div class="section-title">Outros indicadores</div>
-      <div class="charts-row cols-3">
-        <div class="card">
-          <div class="card-title">Eventos por biblioteca</div>
-          <div class="card-sub">No trimestre</div>
-          <div class="chart-wrap" style="height:180px"><canvas id="c-evt" role="img" aria-label="Eventos por biblioteca"></canvas></div>
-        </div>
+      <div class="charts-row cols-2">
         <div class="card">
           <div class="card-title">Atendimentos por biblioteca</div>
           <div class="card-sub">No trimestre</div>
@@ -292,6 +295,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
 
+    <!-- ATENDIMENTO -->
+    <div id="view-atendimento" class="view">
+      <div class="kpi-grid" id="kpi-atendimento"></div>
+      <div class="section-title">Atendimentos por biblioteca</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Total de atendimentos</div>
+          <div class="card-sub">Por biblioteca no trimestre</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-atend-lib" role="img" aria-label="Atendimentos por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Tipos de atendimento</div>
+          <div class="card-sub">Total consolidado das 6 bibliotecas</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-atend-tipos" role="img" aria-label="Tipos de atendimento"></canvas></div>
+          <div class="legend" id="leg-atend-tipos"></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="atendimento-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
     <!-- ACERVO -->
     <div id="view-acervo" class="view">
       <div class="section-title">Acervo por área do conhecimento — sistema</div>
@@ -311,16 +335,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div class="section-title">Detalhamento por biblioteca</div>
       <div id="acervo-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px"></div>
-      <div class="section-title">Tipos de doação — sistema</div>
+      <div class="section-title">Tipos de aquisição — sistema</div>
       <div class="charts-row cols-2">
         <div class="card">
-          <div class="card-title">Distribuição por tipo de doação</div>
+          <div class="card-title">Distribuição por tipo de aquisição</div>
           <div class="card-sub">Todas as bibliotecas</div>
-          <div class="chart-wrap" style="height:240px"><canvas id="c-doacao" role="img" aria-label="Tipos de doação"></canvas></div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-doacao" role="img" aria-label="Tipos de aquisição"></canvas></div>
           <div class="legend" id="leg-doacao"></div>
         </div>
         <div class="card">
-          <div class="card-title">Títulos por tipo de doação e biblioteca</div>
+          <div class="card-title">Títulos por tipo de aquisição e biblioteca</div>
           <div class="card-sub">Participação relativa</div>
           <div id="doacao-progress"></div>
         </div>
@@ -351,6 +375,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="chart-wrap" style="height:300px"><canvas id="c-circ-grouped" role="img" aria-label="Comparativo por área"></canvas></div>
         <div class="legend" id="leg-circ-grouped"></div>
         <div class="legend" id="leg-circ-areas" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px"></div>
+      </div>
+      <div class="section-title">Cadastros</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Cadastros realizados por biblioteca</div>
+        <div class="card-sub">Dados da aba Cadastros de cada planilha</div>
+        <div class="chart-wrap" style="height:240px"><canvas id="c-cadastros-lib" role="img" aria-label="Cadastros realizados por biblioteca"></canvas></div>
       </div>
       <div class="section-title">Detalhamento por biblioteca</div>
       <div id="circ-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:12px"></div>
@@ -484,9 +514,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
 
-    <!-- MINHA BIBLIOTECA -->
+    <!-- BIBLIOTECA DIGITAL -->
     <div id="view-minhaBib" class="view">
-      <div class="info-banner">Serviço centralizado — dados de usuários cadastrados no sistema Minha Biblioteca.</div>
+      <div class="info-banner">Serviço centralizado — dados de usuários cadastrados na Biblioteca digital.</div>
       <div class="kpi-grid" id="kpi-minhaBib"></div>
       <div class="section-title">Usuários cadastrados por trimestre</div>
       <div class="charts-row cols-2">
@@ -498,7 +528,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card">
           <div class="card-title">Distribuição por trimestre</div>
           <div class="card-sub">Participação percentual</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-pizza" role="img" aria-label="Distribuição de cadastros Minha Biblioteca"></canvas></div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-pizza" role="img" aria-label="Distribuição de cadastros da Biblioteca digital"></canvas></div>
           <div class="legend" id="leg-minhaBib-pizza"></div>
         </div>
       </div>
@@ -512,6 +542,53 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <th style="text-align:right">% do total</th>
             </tr></thead>
             <tbody id="tabela-minhaBib"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATALOGAÇÃO -->
+    <div id="view-catalogacao" class="view">
+      <div class="info-banner">Serviço centralizado — dados de catalogação bibliográfica, autoridade, exemplares, JEPEX e fichas catalográficas.</div>
+      <div class="kpi-grid" id="kpi-catalogacao"></div>
+      <div class="section-title">Catalogação — sistema consolidado</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Bibliográfico</div>
+          <div class="card-sub">Novos registros e campos alterados/excluídos</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-cat-biblio" role="img" aria-label="Indicadores bibliográficos de catalogação"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Autoridade</div>
+          <div class="card-sub">Novos, alterados e excluídos</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-cat-autoridade" role="img" aria-label="Indicadores de autoridade de catalogação"></canvas></div>
+        </div>
+      </div>
+      <div class="section-title">Exemplares e produtos</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Exemplares, artigos JEPEX e fichas</div>
+        <div class="card-sub">Totais no trimestre selecionado</div>
+        <div class="chart-wrap" style="height:260px"><canvas id="c-cat-outros" role="img" aria-label="Exemplares, artigos JEPEX e fichas catalográficas"></canvas></div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt" style="min-width:980px">
+            <thead><tr>
+              <th>Trimestre</th>
+              <th style="text-align:right">Bib. novos</th>
+              <th style="text-align:right">Campos alt.</th>
+              <th style="text-align:right">Campos excl.</th>
+              <th style="text-align:right">Aut. novos</th>
+              <th style="text-align:right">Aut. alterados</th>
+              <th style="text-align:right">Aut. excluídos</th>
+              <th style="text-align:right">Ex. novos</th>
+              <th style="text-align:right">Ex. alterados</th>
+              <th style="text-align:right">Ex. excluídos</th>
+              <th style="text-align:right">Artigos JEPEX</th>
+              <th style="text-align:right">Fichas</th>
+            </tr></thead>
+            <tbody id="tabela-catalogacao"></tbody>
           </table>
         </div>
       </div>
@@ -610,6 +687,7 @@ const BIBLIOTECAS=[
 const ID_COMUT='1EiO9S5maIwEDHcVIyOo3shbem5sur2vxDDfsLRuaVUg';
 const ID_BASES='1o83fFB4iARSeirWGfLocZEHSyAmiKkLYpZGosZZAjHQ';
 const ID_MINHA_BIB='1tnkANJxt38WwQFJJUi5lWl38XpSOHcJ0Rn5NDEyNYJI';
+const ID_CATALOGACAO='12Qp6qF5pMBb42i_RjfF4t2XPAnogTlVhyCDqNTDLTDI';
 
 const ABAS_BIB=['Atendimento','Acervo','Circulação','Cadastros','Eventos',
                 'Conservação','Treinamentos','Depósito Legal',
@@ -636,6 +714,15 @@ const temTri=(row,tri,ano)=>row.some(c=>c&&c.includes(`T${tri} ${ano}`));
 async function fetchAba(id,aba){
   try{
     const r=await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`);
+    if(!r.ok)return null;
+    const t=await r.text();
+    return t.trim()?parseCSV(t):null;
+  }catch(e){return null;}
+}
+
+async function fetchPrimeiraAba(id){
+  try{
+    const r=await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`);
     if(!r.ok)return null;
     const t=await r.text();
     return t.trim()?parseCSV(t):null;
@@ -683,7 +770,7 @@ function linhasTipo(rows,tri,ano){
   return out;
 }
 
-// Acervo: col0=títulos, col1=exemplares, col2=doação, col3=área, col4+=tri
+// Acervo: col0=títulos, col1=exemplares, col2=aquisição, col3=área, col4+=tri
 function linhasAcervo(rows,tri,ano){
   if(!rows||!rows.length)return[];
   const out=[];let f=false;
@@ -815,6 +902,59 @@ function linhasMinhaBib(rows,tri,ano){
   return filtered.length>0?filtered:out;
 }
 
+// Catalogação: colunas por cabeçalho + Trimestre
+function linhasCatalogacao(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const norm=s=>limpa(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const header=rows[0]||[];
+  const col=(terms,notTerms=[])=>{
+    const idx=header.findIndex(h=>{
+      const n=norm(h);
+      return terms.every(t=>n.includes(t))&&notTerms.every(t=>!n.includes(t));
+    });
+    return idx>=0?idx:-1;
+  };
+  const cols={
+    bibNovos:col(['bibliografico','novos']),
+    bibCamposAlterados:col(['bibliografico','campos','alterados']),
+    bibCamposExcluidos:col(['bibliografico','campos','excluidos']),
+    autNovos:col(['autoridade','novos']),
+    autAlterados:col(['autoridade','alterados']),
+    autExcluidos:col(['autoridade','excluidos']),
+    exemplaresNovos:col(['exemplares','novos']),
+    exemplaresAlterados:col(['exemplares','alterados']),
+    exemplaresExcluidos:col(['exemplares','excluidos']),
+    artigosJepex:col(['artigos','jepex']),
+    fichas:col(['fichas','catalograficas']),
+    trimestre:col(['trimestre'])
+  };
+  const val=(row,key)=>cols[key]>=0?parseNum(row[cols[key]]):0;
+  const txt=(row,key)=>cols[key]>=0?limpa(row[cols[key]]):'';
+  const tag=`T${tri} ${ano}`;
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||!row.length)continue;
+    const trimestre=txt(row,'trimestre')||row.find(c=>c&&c.includes('T'))||'';
+    if(!trimestre)continue;
+    out.push({
+      trimestre,
+      bibNovos:val(row,'bibNovos'),
+      bibCamposAlterados:val(row,'bibCamposAlterados'),
+      bibCamposExcluidos:val(row,'bibCamposExcluidos'),
+      autNovos:val(row,'autNovos'),
+      autAlterados:val(row,'autAlterados'),
+      autExcluidos:val(row,'autExcluidos'),
+      exemplaresNovos:val(row,'exemplaresNovos'),
+      exemplaresAlterados:val(row,'exemplaresAlterados'),
+      exemplaresExcluidos:val(row,'exemplaresExcluidos'),
+      artigosJepex:val(row,'artigosJepex'),
+      fichas:val(row,'fichas'),
+    });
+  }
+  const filtered=out.filter(l=>l.trimestre.includes(tag)||l.trimestre===tag);
+  return filtered.length>0?filtered:out;
+}
+
 // Multa Solidária: col0=Instituição, col1=CNPJ, col2=kg doados, col3=período arrecadação, col4=data doação, col5=trimestre
 function linhasMulta(rows,tri,ano){
   if(!rows||!rows.length)return[];
@@ -881,14 +1021,16 @@ async function loadAll(){
     resBibs.forEach(({nome,data})=>{G[nome]=data;});
 
     // Serviços centrais
-    const [comutRows,basesRows,minhaBibRows]=await Promise.all([
+    const [comutRows,basesRows,minhaBibRows,catalogacaoRows]=await Promise.all([
       fetchAba(ID_COMUT,'COMUT'),
       fetchAba(ID_BASES,'Bases de Dados'),
       fetchAba(ID_MINHA_BIB,'Minha Biblioteca'),
+      fetchAba(ID_CATALOGACAO,'Catalogação').then(r=>r||fetchPrimeiraAba(ID_CATALOGACAO)),
     ]);
     G._comut=comutRows||[];
     G._bases=basesRows||[];
     G._minhaBib=minhaBibRows||[];
+    G._catalogacao=catalogacaoRows||[];
 
     renderAll(tri,ano);
     document.getElementById('loading').style.display='none';
@@ -938,11 +1080,13 @@ function renderAll(tri,ano){
   const comutL=linhasComut(G._comut,tri,ano);
   const basesL=linhasBases(G._bases,tri,ano);
   const minhaBibL=linhasMinhaBib(G._minhaBib,tri,ano);
+  const catalogacaoL=linhasCatalogacao(G._catalogacao,tri,ano);
 
   renderKPIs(resumo,tri,ano);
   renderNav();
   renderGeralCharts(resumo,libs);
   renderTabela(resumo);
+  renderAtendimento(resumo,libs);
   renderAcervo(resumo);
   renderCirculacao(resumo);
   renderRestauracao(resumo);
@@ -951,6 +1095,7 @@ function renderAll(tri,ano){
   renderComut(comutL,tri,ano);
   renderBases(basesL);
   renderMinhaBib(minhaBibL,tri,ano);
+  renderCatalogacao(catalogacaoL,tri,ano);
   renderMulta(resumo);
   renderNorm(resumo);
   renderDetalhe(resumo);
@@ -976,7 +1121,7 @@ function renderKPIs(resumo,tri,ano){
       </div>
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-value" style="color:${k.cor}">${fmt(s(k.key))}</div>
-      <div class="kpi-sub">${BIBLIOTECAS.length} bibs · ${tri}º tri ${ano}</div>
+      <div class="kpi-sub">${BIBLIOTECAS.length} bibliotecas · ${tri}º tri ${ano}</div>
     </div>`).join('');
 }
 
@@ -1030,7 +1175,6 @@ function renderGeralCharts(resumo,libs){
   mkBar('c-emp',libs,resumo.map(r=>r.emp),CORES);
   mkBar('c-titulos',libs,resumo.map(r=>r.titulos),'#5b21b6');
   mkBar('c-exemplares',libs,resumo.map(r=>r.exemplares),'#854d0e');
-  mkBar('c-evt',libs,resumo.map(r=>r.eventos),'#065f46');
   mkBar('c-atend-bar',libs,resumo.map(r=>r.atendimentos),'#9f1239');
   mkBar('c-trein-bar',libs,resumo.map(r=>r.usuariosTrein),'#0369a1');
   const tot=resumo.reduce((a,b)=>a+b.emp,0);
@@ -1055,6 +1199,37 @@ function renderTabela(resumo){
 }
 
 // ── ACERVO ────────────────────────────────────────────────────────────────────
+function renderAtendimento(resumo,libs){
+  const total=resumo.reduce((a,r)=>a+(r.atendimentos||0),0);
+  const tipoMap={};
+  resumo.forEach(r=>(r.atendL||[]).forEach(l=>{
+    if(l.tipo)tipoMap[l.tipo]=(tipoMap[l.tipo]||0)+(l.valor||0);
+  }));
+  const tipoLabels=Object.keys(tipoMap).sort((a,b)=>tipoMap[b]-tipoMap[a]);
+  const tipoVals=tipoLabels.map(k=>tipoMap[k]);
+  document.getElementById('kpi-atendimento').innerHTML=[
+    {label:'Total de atendimentos',val:total,cor:'#9f1239'},
+    {label:'Tipos de atendimento',val:tipoLabels.length,cor:'#1d4ed8'},
+    {label:'Bibliotecas com atendimento',val:resumo.filter(r=>(r.atendimentos||0)>0).length,cor:'#0f766e'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+  mkBar('c-atend-lib',libs,resumo.map(r=>r.atendimentos||0),resumo.map(r=>r.cor));
+  mkDonut('c-atend-tipos',tipoLabels,tipoVals,CORES10);
+  document.getElementById('leg-atend-tipos').innerHTML=tipoLabels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${total>0?Math.round(tipoVals[i]/total*100):0}%</span>`).join('');
+  document.getElementById('atendimento-grid').innerHTML=resumo.map(r=>{
+    const totalLib=(r.atendL||[]).reduce((a,b)=>a+(b.valor||0),0);
+    const rows=(r.atendL||[]).length===0?semD(3):(r.atendL||[]).map(l=>{
+      const pct=totalLib>0?Math.round((l.valor||0)/totalLib*100):0;
+      return`<tr><td>${l.tipo}</td><td class="num">${fmt(l.valor)}</td><td class="pct">${pct}%</td></tr>`;
+    }).join('');
+    return`<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span style="width:9px;height:9px;border-radius:50%;background:${r.cor};flex-shrink:0"></span>
+      <span style="font-size:13px;font-weight:600">${r.nome}</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text3)">Total: ${fmt(totalLib)}</span></div>
+      <table class="dt"><thead><tr><th>Tipo de atendimento</th><th style="text-align:right">Qtd.</th><th style="text-align:right">%</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
+}
+
 function renderAcervo(resumo){
   const aT={},aE={};AREAS_C.forEach(k=>{aT[k]=0;aE[k]=0;});
   resumo.forEach(r=>{
@@ -1062,13 +1237,13 @@ function renderAcervo(resumo){
     const me=agrupaArea(r.acervoL,'exemplares');
     AREAS_C.forEach(k=>{aT[k]+=mt[k];aE[k]+=me[k];});
   });
-  mkDonut('c-area-titulos',AREAS_C,AREAS_C.map(k=>aT[k]),CORES10);
-  mkDonut('c-area-exemplares',AREAS_C,AREAS_C.map(k=>aE[k]),CORES10);
+  mkDonut('c-area-titulos',AREAS_C.map(areaLabel),AREAS_C.map(k=>aT[k]),CORES10);
+  mkDonut('c-area-exemplares',AREAS_C.map(areaLabel),AREAS_C.map(k=>aE[k]),CORES10);
   const totT=AREAS_C.reduce((a,k)=>a+aT[k],0),totE=AREAS_C.reduce((a,k)=>a+aE[k],0);
   document.getElementById('leg-area-titulos').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${totT>0?Math.round(aT[k]/totT*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${totT>0?Math.round(aT[k]/totT*100):0}%</span>`).join('');
   document.getElementById('leg-area-exemplares').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${totE>0?Math.round(aE[k]/totE*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${totE>0?Math.round(aE[k]/totE*100):0}%</span>`).join('');
 
   document.getElementById('acervo-grid').innerHTML=resumo.map((r,i)=>{
     const mt=agrupaArea(r.acervoL,'titulos'),me=agrupaArea(r.acervoL,'exemplares');
@@ -1086,13 +1261,13 @@ function renderAcervo(resumo){
       </div>
       <div class="sub-tab-bar">
         <div class="sub-tab active" onclick="subTab(this,'ac${i}','area')">Por área</div>
-        <div class="sub-tab" onclick="subTab(this,'ac${i}','doacao')">Tipo de doação</div>
+        <div class="sub-tab" onclick="subTab(this,'ac${i}','doacao')">Tipo de aquisição</div>
       </div>
       <div id="ac${i}-area" class="sub-panel active">
         <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Títulos</th><th style="text-align:right">Exemplares</th></tr></thead><tbody>${aHTML}</tbody></table>
       </div>
       <div id="ac${i}-doacao" class="sub-panel">
-        <table class="dt"><thead><tr><th>Tipo de doação</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${dHTML}</tbody></table>
+        <table class="dt"><thead><tr><th>Tipo de aquisição</th><th style="text-align:right">Títulos</th></tr></thead><tbody>${dHTML}</tbody></table>
       </div>
     </div>`;
   }).join('');
@@ -1115,7 +1290,7 @@ function renderAcervo(resumo){
       <div class="progress-val">${fmt(vals[i])}</div></div>`;});
     ph+='</div>';
   });
-  document.getElementById('doacao-progress').innerHTML=ph||`<p style="font-size:13px;color:var(--text3);padding:12px 0">Sem dados de doação.</p>`;
+  document.getElementById('doacao-progress').innerHTML=ph||`<p style="font-size:13px;color:var(--text3);padding:12px 0">Sem dados de aquisição.</p>`;
 }
 
 // ── CIRCULAÇÃO ────────────────────────────────────────────────────────────────
@@ -1125,13 +1300,13 @@ function renderCirculacao(resumo){
     const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
     AREAS_C.forEach(k=>{eA[k]+=me[k];dA[k]+=md[k];});
   });
-  mkDonut('c-circ-emp',AREAS_C,AREAS_C.map(k=>eA[k]),CORES10);
-  mkDonut('c-circ-dev',AREAS_C,AREAS_C.map(k=>dA[k]),CORES10);
+  mkDonut('c-circ-emp',AREAS_C.map(areaLabel),AREAS_C.map(k=>eA[k]),CORES10);
+  mkDonut('c-circ-dev',AREAS_C.map(areaLabel),AREAS_C.map(k=>dA[k]),CORES10);
   const tE=AREAS_C.reduce((a,k)=>a+eA[k],0),tD=AREAS_C.reduce((a,k)=>a+dA[k],0);
   document.getElementById('leg-circ-emp').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tE>0?Math.round(eA[k]/tE*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${tE>0?Math.round(eA[k]/tE*100):0}%</span>`).join('');
   document.getElementById('leg-circ-dev').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tD>0?Math.round(dA[k]/tD*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${tD>0?Math.round(dA[k]/tD*100):0}%</span>`).join('');
   mkGrouped('c-circ-grouped',AREAS_C,[
     {label:'Empréstimos',data:AREAS_C.map(k=>eA[k]),backgroundColor:'#1d4ed8',borderRadius:4,borderSkipped:false},
     {label:'Devoluções', data:AREAS_C.map(k=>dA[k]),backgroundColor:'#0f766e',borderRadius:4,borderSkipped:false},
@@ -1141,21 +1316,20 @@ function renderCirculacao(resumo){
      <span><span class="leg-sq" style="background:#0f766e"></span>Devoluções</span>`;
   document.getElementById('leg-circ-areas').innerHTML=
     AREAS_C.map((k,i)=>`<span><span class="leg-sq" style="background:${CORES10[i]};border-radius:2px"></span>${k} — ${(AREAS_CDD[i]||'').replace(/^\d+ - /,'')}</span>`).join('');
+  mkBar('c-cadastros-lib',resumo.map(r=>r.nome),resumo.map(r=>r.cadastros||0),resumo.map(r=>r.cor));
   document.getElementById('circ-grid').innerHTML=resumo.map((r,i)=>{
     const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
     const linhas=AREAS_C.map(k=>({area:k,emp:me[k],dev:md[k]})).filter(l=>l.emp>0||l.dev>0);
-    const rows=linhas.length===0?semD(4):linhas.map(l=>{
-      const s=l.emp-l.dev;
+    const rows=linhas.length===0?semD(3):linhas.map(l=>{
       return`<tr><td><span class="area-chip">${l.area}</span>${areaLabel(l.area)}</td>
-        <td class="num">${fmt(l.emp)}</td><td class="num">${fmt(l.dev)}</td>
-        <td class="num" style="color:${s>=0?'var(--teal)':'var(--rose)'}">${s>=0?'+':''}${fmt(s)}</td></tr>`;}).join('');
+        <td class="num">${fmt(l.emp)}</td><td class="num">${fmt(l.dev)}</td></tr>`;}).join('');
     return`<div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:600">${r.nome}</span>
         <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.emp)} emp · ${fmt(r.dev)} dev</span>
       </div>
-      <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Empréstimos</th><th style="text-align:right">Devoluções</th><th style="text-align:right">Saldo</th></tr></thead>
+      <table class="dt"><thead><tr><th>Área</th><th style="text-align:right">Empréstimos</th><th style="text-align:right">Devoluções</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;}).join('');
 }
 
@@ -1174,13 +1348,13 @@ function renderRestauracao(resumo){
     const md=agrupaArea(r.restL,'dan'),mr=agrupaArea(r.restL,'res');
     AREAS_C.forEach(k=>{rDan[k]+=md[k];rRes[k]+=mr[k];});
   });
-  mkDonut('c-rest-dan',AREAS_C,AREAS_C.map(k=>rDan[k]),CORES10);
-  mkDonut('c-rest-res',AREAS_C,AREAS_C.map(k=>rRes[k]),CORES10);
+  mkDonut('c-rest-dan',AREAS_C.map(areaLabel),AREAS_C.map(k=>rDan[k]),CORES10);
+  mkDonut('c-rest-res',AREAS_C.map(areaLabel),AREAS_C.map(k=>rRes[k]),CORES10);
   const tD=AREAS_C.reduce((a,k)=>a+rDan[k],0),tR=AREAS_C.reduce((a,k)=>a+rRes[k],0);
   document.getElementById('leg-rest-dan').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tD>0?Math.round(rDan[k]/tD*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${tD>0?Math.round(rDan[k]/tD*100):0}%</span>`).join('');
   document.getElementById('leg-rest-res').innerHTML=AREAS_C.map((k,i)=>
-    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${k} ${tR>0?Math.round(rRes[k]/tR*100):0}%</span>`).join('');
+    `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${tR>0?Math.round(rRes[k]/tR*100):0}%</span>`).join('');
 
   document.getElementById('rest-grid').innerHTML=resumo.map((r,i)=>{
     const linhas=r.restL.filter(l=>l.dan>0||l.res>0);
@@ -1234,6 +1408,13 @@ function renderTreinamentos(resumo,libs){
       <tbody>${rows}</tbody></table></div>`;}).join('');
 }
 
+function depTipoRank(tipo){
+  const n=limpa(tipo).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const ordem=['tcc graduacao','tcc especializacao','dissertacao','tese'];
+  const idx=ordem.findIndex(o=>n.includes(o));
+  return idx>=0?idx:ordem.length;
+}
+
 // ── DEPÓSITO LEGAL ────────────────────────────────────────────────────────────
 function renderDeposito(resumo){
   const totRec=resumo.reduce((a,r)=>a+r.depRec,0);
@@ -1250,7 +1431,7 @@ function renderDeposito(resumo){
     if(!tipoMap[l.tipo])tipoMap[l.tipo]={rec:0,emb:0};
     tipoMap[l.tipo].rec+=l.rec;tipoMap[l.tipo].emb+=l.emb;
   }));
-  const tLabels=Object.keys(tipoMap);
+  const tLabels=Object.keys(tipoMap).sort((a,b)=>depTipoRank(a)-depTipoRank(b)||a.localeCompare(b,'pt-BR'));
   mkGrouped('c-dep-grouped',tLabels,[
     {label:'Recebidos', data:tLabels.map(k=>tipoMap[k].rec),backgroundColor:'#1d4ed8',borderRadius:4,borderSkipped:false},
     {label:'Embargados',data:tLabels.map(k=>tipoMap[k].emb),backgroundColor:'#9f1239',borderRadius:4,borderSkipped:false},
@@ -1264,7 +1445,8 @@ function renderDeposito(resumo){
     `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${pTot>0?Math.round(tipoMap[l].rec/pTot*100):0}%</span>`).join('');
 
   document.getElementById('dep-grid').innerHTML=resumo.map((r,i)=>{
-    const rows=r.depL.length===0?semD(4):r.depL.map(l=>
+    const depOrdenado=[...(r.depL||[])].sort((a,b)=>depTipoRank(a.tipo)-depTipoRank(b.tipo)||a.tipo.localeCompare(b.tipo,'pt-BR'));
+    const rows=depOrdenado.length===0?semD(4):depOrdenado.map(l=>
       `<tr><td>${l.tipo}</td><td class="num">${fmt(l.rec)}</td><td class="num">${fmt(l.emb)}</td>
        <td class="num">${fmt(l.rec-l.emb)}</td></tr>`).join('');
     return`<div class="card">
@@ -1365,6 +1547,50 @@ function renderBases(linhas){
 }
 
 // ── MULTA SOLIDÁRIA ───────────────────────────────────────────────────────────
+function renderCatalogacao(linhas,tri,ano){
+  const soma=k=>linhas.reduce((a,l)=>a+(l[k]||0),0);
+  const totalBiblio=soma('bibNovos')+soma('bibCamposAlterados')+soma('bibCamposExcluidos');
+  const totalAutoridade=soma('autNovos')+soma('autAlterados')+soma('autExcluidos');
+  const totalExemplares=soma('exemplaresNovos')+soma('exemplaresAlterados')+soma('exemplaresExcluidos');
+  document.getElementById('kpi-catalogacao').innerHTML=[
+    {label:'Ações bibliográficas',val:totalBiblio,cor:'#1d4ed8',bg:'#eff4ff'},
+    {label:'Ações de autoridade',val:totalAutoridade,cor:'#0f766e',bg:'#f0fdf9'},
+    {label:'Exemplares',val:totalExemplares,cor:'#854d0e',bg:'#fef3c7'},
+    {label:'Artigos JEPEX',val:soma('artigosJepex'),cor:'#5b21b6',bg:'#f5f3ff'},
+    {label:'Fichas catalográficas',val:soma('fichas'),cor:'#9f1239',bg:'#fff1f2'},
+    {label:'Registros encontrados',val:linhas.length,cor:'#065f46',bg:'#ecfdf5'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div><div class="kpi-sub">${tri}º tri ${ano}</div></div>`).join('');
+
+  mkBar('c-cat-biblio',
+    ['Novos','Campos alt.','Campos excl.'],
+    [soma('bibNovos'),soma('bibCamposAlterados'),soma('bibCamposExcluidos')],
+    ['#1d4ed8','#5b21b6','#9f1239']);
+  mkBar('c-cat-autoridade',
+    ['Novos','Alterados','Excluídos'],
+    [soma('autNovos'),soma('autAlterados'),soma('autExcluidos')],
+    ['#0f766e','#1d4ed8','#9f1239']);
+  mkBar('c-cat-outros',
+    ['Ex. novos','Ex. alterados','Ex. excluídos','Artigos JEPEX','Fichas'],
+    [soma('exemplaresNovos'),soma('exemplaresAlterados'),soma('exemplaresExcluidos'),soma('artigosJepex'),soma('fichas')],
+    ['#854d0e','#b45309','#9f1239','#5b21b6','#0f766e']);
+
+  document.getElementById('tabela-catalogacao').innerHTML=linhas.length===0?semD(12):
+    linhas.map(l=>`<tr>
+      <td>${l.trimestre||`${tri}º tri ${ano}`}</td>
+      <td class="num">${fmt(l.bibNovos)}</td>
+      <td class="num">${fmt(l.bibCamposAlterados)}</td>
+      <td class="num">${fmt(l.bibCamposExcluidos)}</td>
+      <td class="num">${fmt(l.autNovos)}</td>
+      <td class="num">${fmt(l.autAlterados)}</td>
+      <td class="num">${fmt(l.autExcluidos)}</td>
+      <td class="num">${fmt(l.exemplaresNovos)}</td>
+      <td class="num">${fmt(l.exemplaresAlterados)}</td>
+      <td class="num">${fmt(l.exemplaresExcluidos)}</td>
+      <td class="num">${fmt(l.artigosJepex)}</td>
+      <td class="num">${fmt(l.fichas)}</td>
+    </tr>`).join('');
+}
+
 function renderMulta(resumo){
   const totKg=resumo.reduce((a,r)=>a+(r.kgDoados||0),0);
   const totInst=resumo.reduce((a,r)=>a+(r.multaL||[]).length,0);
@@ -1512,7 +1738,7 @@ function renderProgress(resumo){
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────────
-const TAB_MAP={geral:'geral',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'minha biblioteca',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
+const TAB_MAP={geral:'geral',atendimento:'atendimento',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'biblioteca digital',catalogacao:'catalogação',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
 function setTab(v,el){
   document.querySelectorAll('.tab,.nav-item').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(t=>t.classList.remove('active'));
