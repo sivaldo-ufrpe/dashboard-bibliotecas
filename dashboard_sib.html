@@ -257,14 +257,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="section-title">Acervo</div>
       <div class="charts-row cols-2">
         <div class="card">
-          <div class="card-title">Títulos por biblioteca</div>
+          <div class="card-title">Novos títulos por biblioteca</div>
           <div class="card-sub">Total no período</div>
-          <div class="chart-wrap" style="height:200px"><canvas id="c-titulos" role="img" aria-label="Títulos por biblioteca"></canvas></div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c-titulos" role="img" aria-label="Novos títulos por biblioteca"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-title">Exemplares por biblioteca</div>
+          <div class="card-title">Novos exemplares por biblioteca</div>
           <div class="card-sub">Total no período</div>
-          <div class="chart-wrap" style="height:200px"><canvas id="c-exemplares" role="img" aria-label="Exemplares por biblioteca"></canvas></div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c-exemplares" role="img" aria-label="Novos exemplares por biblioteca"></canvas></div>
         </div>
       </div>
       <div class="section-title">Outros indicadores</div>
@@ -286,8 +286,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <table class="dt">
             <thead><tr>
               <th>Biblioteca</th><th>Atendimentos</th><th>Empréstimos</th>
-              <th>Devoluções</th><th>Títulos</th><th>Exemplares</th>
-              <th>Treinamentos</th><th>Eventos</th><th>Status</th>
+              <th>Devoluções</th><th>Novos títulos</th><th>Novos exemplares</th>
+              <th>Treinamentos</th><th>Status</th>
             </tr></thead>
             <tbody id="tabela"></tbody>
           </table>
@@ -307,7 +307,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
         <div class="card">
           <div class="card-title">Tipos de atendimento</div>
-          <div class="card-sub">Total consolidado das 6 bibliotecas</div>
+          <div class="card-sub" id="atend-tipos-sub">Total consolidado das bibliotecas</div>
           <div class="chart-wrap" style="height:240px"><canvas id="c-atend-tipos" role="img" aria-label="Tipos de atendimento"></canvas></div>
           <div class="legend" id="leg-atend-tipos"></div>
         </div>
@@ -318,18 +318,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
     <!-- ACERVO -->
     <div id="view-acervo" class="view">
-      <div class="section-title">Acervo por área do conhecimento — sistema</div>
+      <div class="section-title">Crescimento do Acervo por área</div>
       <div class="charts-row cols-2">
         <div class="card">
-          <div class="card-title">Títulos por área</div>
+          <div class="card-title">Novos títulos por área</div>
           <div class="card-sub">Soma de todas as bibliotecas</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="c-area-titulos" role="img" aria-label="Títulos por área"></canvas></div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-area-titulos" role="img" aria-label="Novos títulos por área"></canvas></div>
           <div class="legend" id="leg-area-titulos"></div>
         </div>
         <div class="card">
-          <div class="card-title">Exemplares por área</div>
+          <div class="card-title">Novos exemplares por área</div>
           <div class="card-sub">Soma de todas as bibliotecas</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="c-area-exemplares" role="img" aria-label="Exemplares por área"></canvas></div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-area-exemplares" role="img" aria-label="Novos exemplares por área"></canvas></div>
           <div class="legend" id="leg-area-exemplares"></div>
         </div>
       </div>
@@ -683,6 +683,7 @@ const BIBLIOTECAS=[
   {nome:'UACSA',    id:'1MWqWkD3gMfT4hYVf6vT-y4qGk7VaINi4VeMn7iy5t0Q'},
   {nome:'UABJ',     id:'1U7bB4q_ZJ4ITM78YLYTvnroz9A2kRa9A93dF8gCwKw0'},
   {nome:'CODAI',    id:'1N0cEkzuT-1fL3a7aH-bItRx5qvShe5cZkdCqurQHknQ'},
+  {nome:'UAEADTEC', id:'1lW7-goB0phj_2gJLcdaUFAC4fHxZxyNAf9iLIEDiTsA'},
 ];
 const ID_COMUT='1EiO9S5maIwEDHcVIyOo3shbem5sur2vxDDfsLRuaVUg';
 const ID_BASES='1o83fFB4iARSeirWGfLocZEHSyAmiKkLYpZGosZZAjHQ';
@@ -697,7 +698,7 @@ const AREAS_CDD=['000 - Generalidades','100 - Filosofia e Psicologia','200 - Rel
   '300 - Ciências Sociais','400 - Linguagem','500 - Ciências',
   '600 - Tecnologia','700 - Artes','800 - Literatura e Retórica','900 - História e Geografia'];
 const AREAS_C=['000','100','200','300','400','500','600','700','800','900'];
-const CORES=['#1d4ed8','#0f766e','#854d0e','#5b21b6','#9f1239','#065f46'];
+const CORES=['#1d4ed8','#0f766e','#854d0e','#5b21b6','#9f1239','#065f46','#0369a1'];
 const CORES10=['#1d4ed8','#0f766e','#854d0e','#5b21b6','#9f1239','#065f46','#0369a1','#7c3aed','#b45309','#be123c'];
 
 Chart.register(ChartDataLabels);
@@ -1109,10 +1110,9 @@ function renderKPIs(resumo,tri,ano){
   const kpis=[
     {key:'emp',label:'Empréstimos',cor:'#1d4ed8',bg:'#eff4ff'},
     {key:'dev',label:'Devoluções',cor:'#0f766e',bg:'#f0fdf9'},
-    {key:'titulos',label:'Títulos',cor:'#5b21b6',bg:'#f5f3ff'},
-    {key:'exemplares',label:'Exemplares',cor:'#854d0e',bg:'#fef3c7'},
+    {key:'titulos',label:'Novos títulos',cor:'#5b21b6',bg:'#f5f3ff'},
+    {key:'exemplares',label:'Novos exemplares',cor:'#854d0e',bg:'#fef3c7'},
     {key:'atendimentos',label:'Atendimentos',cor:'#9f1239',bg:'#fff1f2'},
-    {key:'eventos',label:'Eventos',cor:'#065f46',bg:'#ecfdf5'},
   ];
   document.getElementById('kpi-grid').innerHTML=kpis.map(k=>`
     <div class="kpi-card">
@@ -1132,14 +1132,14 @@ function renderNav(){
 }
 
 // ── CHART HELPERS ─────────────────────────────────────────────────────────────
-const DL={anchor:'end',align:'end',offset:2,color:'#6b6860',font:{size:11,family:'DM Mono',weight:'500'},formatter:v=>v>0?v.toLocaleString('pt-BR'):''};
+const DL={anchor:'end',align:'start',offset:-2,clamp:true,color:'#fff',font:{size:11,family:'DM Mono',weight:'500'},formatter:v=>v>0?v.toLocaleString('pt-BR'):''};
 
 function mkBar(id,labels,data,color){
   if(chartsAtivos[id])chartsAtivos[id].destroy();
   chartsAtivos[id]=new Chart(document.getElementById(id),{
     type:'bar',
     data:{labels,datasets:[{data,backgroundColor:color,borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:8}},
       plugins:{legend:{display:false},datalabels:DL},
       scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11,family:'DM Mono'}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
   });
@@ -1159,8 +1159,8 @@ function mkGrouped(id,labels,datasets){
   chartsAtivos[id]=new Chart(document.getElementById(id),{
     type:'bar',
     data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',offset:1,color:'#6b6860',font:{size:10,family:'DM Mono'},formatter:v=>v>0?fmt(v):''}},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:8}},
+      plugins:{legend:{display:false},datalabels:{anchor:'end',align:'start',offset:-2,clamp:true,color:'#fff',font:{size:10,family:'DM Mono',weight:'500'},formatter:v=>v>0?fmt(v):''}},
       scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11,family:'DM Mono'}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
   });
 }
@@ -1186,14 +1186,14 @@ function renderGeralCharts(resumo,libs){
 function renderTabela(resumo){
   const max=k=>Math.max(...resumo.map(r=>r[k]),1);
   document.getElementById('tabela').innerHTML=resumo.map((r,i)=>{
-    const score=(r.emp/max('emp')+r.titulos/max('titulos')+r.eventos/max('eventos'))/3;
+    const score=(r.emp/max('emp')+r.titulos/max('titulos')+r.atendimentos/max('atendimentos'))/3;
     const[bc,bl]=score>=.7?['badge-green','Destaque']:score>=.4?['badge-blue','Regular']:['badge-amber','Atenção'];
     return`<tr>
       <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
       <td class="num">${fmt(r.atendimentos)}</td><td class="num">${fmt(r.emp)}</td>
       <td class="num">${fmt(r.dev)}</td><td class="num">${fmt(r.titulos)}</td>
       <td class="num">${fmt(r.exemplares)}</td>
-      <td class="num">${fmt(r.usuariosTrein)}</td><td class="num">${fmt(r.eventos)}</td>
+      <td class="num">${fmt(r.usuariosTrein)}</td>
       <td><span class="badge ${bc}">${bl}</span></td></tr>`;
   }).join('');
 }
@@ -1207,6 +1207,7 @@ function renderAtendimento(resumo,libs){
   }));
   const tipoLabels=Object.keys(tipoMap).sort((a,b)=>tipoMap[b]-tipoMap[a]);
   const tipoVals=tipoLabels.map(k=>tipoMap[k]);
+  document.getElementById('atend-tipos-sub').textContent=`Total consolidado das ${BIBLIOTECAS.length} bibliotecas`;
   document.getElementById('kpi-atendimento').innerHTML=[
     {label:'Total de atendimentos',val:total,cor:'#9f1239'},
     {label:'Tipos de atendimento',val:tipoLabels.length,cor:'#1d4ed8'},
