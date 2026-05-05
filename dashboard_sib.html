@@ -139,6 +139,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="nav-item" onclick="setTab('atendimento',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"/><path d="M8 9h8M8 13h5"/></svg>Atendimento
     </div>
+    <div class="nav-item" onclick="setTab('cadastros',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>Cadastros
+    </div>
     <div class="nav-item" onclick="setTab('acervo',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Acervo
     </div>
@@ -223,6 +226,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="tab-bar">
       <div class="tab active" onclick="setTab('geral',this)">Visão geral</div>
       <div class="tab" onclick="setTab('atendimento',this)">Atendimento</div>
+      <div class="tab" onclick="setTab('cadastros',this)">Cadastros</div>
       <div class="tab" onclick="setTab('acervo',this)">Acervo</div>
       <div class="tab" onclick="setTab('circulacao',this)">Circulação</div>
       <div class="tab" onclick="setTab('restauracao',this)">Restauração</div>
@@ -316,6 +320,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div id="atendimento-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px"></div>
     </div>
 
+    <!-- CADASTROS -->
+    <div id="view-cadastros" class="view">
+      <div class="kpi-grid" id="kpi-cadastros"></div>
+      <div class="section-title">Cadastros por biblioteca</div>
+      <div class="charts-row">
+        <div class="card">
+          <div class="card-title">Cadastros realizados por biblioteca</div>
+          <div class="card-sub">Dados da aba Cadastros de cada planilha</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-cadastros-lib" role="img" aria-label="Cadastros realizados por biblioteca"></canvas></div>
+        </div>
+      </div>
+      <div class="section-title">Detalhamento por biblioteca</div>
+      <div id="cadastros-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px"></div>
+    </div>
+
     <!-- ACERVO -->
     <div id="view-acervo" class="view">
       <div class="section-title">Crescimento do Acervo por área</div>
@@ -375,12 +394,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="chart-wrap" style="height:300px"><canvas id="c-circ-grouped" role="img" aria-label="Comparativo por área"></canvas></div>
         <div class="legend" id="leg-circ-grouped"></div>
         <div class="legend" id="leg-circ-areas" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px"></div>
-      </div>
-      <div class="section-title">Cadastros</div>
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-title">Cadastros realizados por biblioteca</div>
-        <div class="card-sub">Dados da aba Cadastros de cada planilha</div>
-        <div class="chart-wrap" style="height:240px"><canvas id="c-cadastros-lib" role="img" aria-label="Cadastros realizados por biblioteca"></canvas></div>
       </div>
       <div class="section-title">Detalhamento por biblioteca</div>
       <div id="circ-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:12px"></div>
@@ -903,6 +916,29 @@ function linhasMinhaBib(rows,tri,ano){
   return filtered.length>0?filtered:out;
 }
 
+// Cadastros: colunas Usuários cadastrados e Trimestre
+function linhasCadastros(rows,tri,ano){
+  if(!rows||!rows.length)return[];
+  const norm=s=>limpa(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const header=rows[0]||[];
+  const colUsuarios=header.findIndex(h=>{
+    const n=norm(h);
+    return n.includes('usuarios cadastrados')||n.includes('usuario cadastrado');
+  });
+  const colTri=header.findIndex(h=>norm(h).includes('trimestre'));
+  const idxU=colUsuarios>=0?colUsuarios:0;
+  const idxT=colTri>=0?colTri:1;
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const trimestre=limpa(row[idxT]);if(!trimestre)continue;
+    out.push({trimestre,usuarios:parseNum(row[idxU])});
+  }
+  const tag=`T${tri} ${ano}`;
+  const filtered=out.filter(l=>l.trimestre.includes(tag)||l.trimestre===tag);
+  return filtered.length>0?filtered:out;
+}
+
 // Catalogação: colunas por cabeçalho + Trimestre
 function linhasCatalogacao(rows,tri,ano){
   if(!rows||!rows.length)return[];
@@ -1055,10 +1091,12 @@ function renderAll(tri,ano){
     const depL   =linhasDep(d['Depósito Legal']||[],tri,ano);
     const multaL =linhasMulta(d['Multa Solidária']||[],tri,ano);
     const normD  =linhasNorm(d['Normalização']||[],tri,ano);
+    const cadastrosL=linhasCadastros(d['Cadastros']||[],tri,ano);
+    const cadastrosTotal=cadastrosL.reduce((a,l)=>a+(l.usuarios||0),0);
     return{
       nome,cor:CORES[i],
       atendimentos:somaUltimaCol(d['Atendimento']||[],tri,ano),
-      cadastros:   somaUltimaCol(d['Cadastros']||[],tri,ano),
+      cadastros:   cadastrosTotal,
       eventos:     somaUltimaCol(d['Eventos']||[],tri,ano),
       titulos:     acervoL.reduce((a,l)=>a+l.titulos,0),
       exemplares:  acervoL.reduce((a,l)=>a+l.exemplares,0),
@@ -1073,7 +1111,7 @@ function renderAll(tri,ano){
       kgDoados:    multaL.reduce((a,l)=>a+l.kg,0),
       normPresencial: normD.presencial,
       normOnline:     normD.online,
-      acervoL,circL,restL,treinL,depL,multaL,normD,
+      acervoL,circL,restL,treinL,depL,multaL,normD,cadastrosL,
       atendL:linhasTipo(d['Atendimento']||[],tri,ano),
     };
   });
@@ -1088,6 +1126,7 @@ function renderAll(tri,ano){
   renderGeralCharts(resumo,libs);
   renderTabela(resumo);
   renderAtendimento(resumo,libs);
+  renderCadastros(resumo,libs);
   renderAcervo(resumo);
   renderCirculacao(resumo);
   renderRestauracao(resumo);
@@ -1231,6 +1270,29 @@ function renderAtendimento(resumo,libs){
   }).join('');
 }
 
+function renderCadastros(resumo,libs){
+  const cadResumo=resumo.filter(r=>r.nome!=='UAEADTEC');
+  const total=cadResumo.reduce((a,r)=>a+(r.cadastros||0),0);
+  document.getElementById('kpi-cadastros').innerHTML=[
+    {label:'Total de cadastros',val:total,cor:'#1d4ed8'},
+    {label:'Bibliotecas com cadastros',val:cadResumo.filter(r=>(r.cadastros||0)>0).length,cor:'#0f766e'},
+    {label:'Registros encontrados',val:cadResumo.reduce((a,r)=>a+(r.cadastrosL||[]).length,0),cor:'#5b21b6'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+  mkBar('c-cadastros-lib',cadResumo.map(r=>r.nome),cadResumo.map(r=>r.cadastros||0),cadResumo.map(r=>r.cor));
+  document.getElementById('cadastros-grid').innerHTML=cadResumo.map(r=>{
+    const lista=r.cadastrosL||[];
+    const totalLib=lista.reduce((a,b)=>a+(b.usuarios||0),0);
+    const rows=lista.length===0?semD(2):lista.map(l=>{
+      return`<tr><td>${l.trimestre}</td><td class="num">${fmt(l.usuarios)}</td></tr>`;
+    }).join('');
+    return`<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span style="width:9px;height:9px;border-radius:50%;background:${r.cor};flex-shrink:0"></span>
+      <span style="font-size:13px;font-weight:600">${r.nome}</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text3)">Total: ${fmt(totalLib)}</span></div>
+      <table class="dt"><thead><tr><th>Trimestre</th><th style="text-align:right">Usuários cadastrados</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
+}
+
 function renderAcervo(resumo){
   const aT={},aE={};AREAS_C.forEach(k=>{aT[k]=0;aE[k]=0;});
   resumo.forEach(r=>{
@@ -1295,9 +1357,12 @@ function renderAcervo(resumo){
 }
 
 // ── CIRCULAÇÃO ────────────────────────────────────────────────────────────────
+const semUAEADTEC=lista=>lista.filter(r=>r.nome!=='UAEADTEC');
+
 function renderCirculacao(resumo){
+  const dados=semUAEADTEC(resumo);
   const eA={},dA={};AREAS_C.forEach(k=>{eA[k]=0;dA[k]=0;});
-  resumo.forEach(r=>{
+  dados.forEach(r=>{
     const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
     AREAS_C.forEach(k=>{eA[k]+=me[k];dA[k]+=md[k];});
   });
@@ -1317,8 +1382,7 @@ function renderCirculacao(resumo){
      <span><span class="leg-sq" style="background:#0f766e"></span>Devoluções</span>`;
   document.getElementById('leg-circ-areas').innerHTML=
     AREAS_C.map((k,i)=>`<span><span class="leg-sq" style="background:${CORES10[i]};border-radius:2px"></span>${k} — ${(AREAS_CDD[i]||'').replace(/^\d+ - /,'')}</span>`).join('');
-  mkBar('c-cadastros-lib',resumo.map(r=>r.nome),resumo.map(r=>r.cadastros||0),resumo.map(r=>r.cor));
-  document.getElementById('circ-grid').innerHTML=resumo.map((r,i)=>{
+  document.getElementById('circ-grid').innerHTML=dados.map((r,i)=>{
     const me=agrupaArea(r.circL,'emp'),md=agrupaArea(r.circL,'dev');
     const linhas=AREAS_C.map(k=>({area:k,emp:me[k],dev:md[k]})).filter(l=>l.emp>0||l.dev>0);
     const rows=linhas.length===0?semD(3):linhas.map(l=>{
@@ -1326,7 +1390,7 @@ function renderCirculacao(resumo){
         <td class="num">${fmt(l.emp)}</td><td class="num">${fmt(l.dev)}</td></tr>`;}).join('');
     return`<div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="width:9px;height:9px;border-radius:50%;background:${r.cor};flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:600">${r.nome}</span>
         <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.emp)} emp · ${fmt(r.dev)} dev</span>
       </div>
@@ -1336,8 +1400,9 @@ function renderCirculacao(resumo){
 
 // ── RESTAURAÇÃO ───────────────────────────────────────────────────────────────
 function renderRestauracao(resumo){
-  const totDan=resumo.reduce((a,r)=>a+r.danificados,0);
-  const totRes=resumo.reduce((a,r)=>a+r.restaurados,0);
+  const dados=semUAEADTEC(resumo);
+  const totDan=dados.reduce((a,r)=>a+r.danificados,0);
+  const totRes=dados.reduce((a,r)=>a+r.restaurados,0);
   document.getElementById('kpi-rest').innerHTML=[
     {label:'Materiais danificados',val:totDan,cor:'#9f1239',bg:'#fff1f2'},
     {label:'Materiais restaurados',val:totRes,cor:'#0f766e',bg:'#f0fdf9'},
@@ -1345,7 +1410,7 @@ function renderRestauracao(resumo){
   ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${typeof k.val==='number'?fmt(k.val):k.val}</div></div>`).join('');
 
   const rDan={},rRes={};AREAS_C.forEach(k=>{rDan[k]=0;rRes[k]=0;});
-  resumo.forEach(r=>{
+  dados.forEach(r=>{
     const md=agrupaArea(r.restL,'dan'),mr=agrupaArea(r.restL,'res');
     AREAS_C.forEach(k=>{rDan[k]+=md[k];rRes[k]+=mr[k];});
   });
@@ -1357,7 +1422,7 @@ function renderRestauracao(resumo){
   document.getElementById('leg-rest-res').innerHTML=AREAS_C.map((k,i)=>
     `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${tR>0?Math.round(rRes[k]/tR*100):0}%</span>`).join('');
 
-  document.getElementById('rest-grid').innerHTML=resumo.map((r,i)=>{
+  document.getElementById('rest-grid').innerHTML=dados.map((r,i)=>{
     const linhas=r.restL.filter(l=>l.dan>0||l.res>0);
     const rows=linhas.length===0?semD(4):linhas.map(l=>{
       const tx=l.dan>0?Math.round(l.res/l.dan*100):0;
@@ -1366,7 +1431,7 @@ function renderRestauracao(resumo){
         <td class="num">${tx}%</td></tr>`;}).join('');
     return`<div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span style="width:9px;height:9px;border-radius:50%;background:${CORES[i]};flex-shrink:0"></span>
+        <span style="width:9px;height:9px;border-radius:50%;background:${r.cor};flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:600">${r.nome}</span>
         <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(r.danificados)} dan. · ${fmt(r.restaurados)} rest.</span>
       </div>
@@ -1593,15 +1658,16 @@ function renderCatalogacao(linhas,tri,ano){
 }
 
 function renderMulta(resumo){
-  const totKg=resumo.reduce((a,r)=>a+(r.kgDoados||0),0);
-  const totInst=resumo.reduce((a,r)=>a+(r.multaL||[]).length,0);
+  const dados=semUAEADTEC(resumo);
+  const totKg=dados.reduce((a,r)=>a+(r.kgDoados||0),0);
+  const totInst=dados.reduce((a,r)=>a+(r.multaL||[]).length,0);
   document.getElementById('kpi-multa').innerHTML=[
     {label:'Total de kg doados',val:totKg,cor:'#065f46',bg:'#ecfdf5'},
     {label:'Instituições contempladas',val:totInst,cor:'#1d4ed8',bg:'#eff4ff'},
-    {label:'Bibliotecas participantes',val:resumo.filter(r=>(r.kgDoados||0)>0).length,cor:'#5b21b6',bg:'#f5f3ff'},
+    {label:'Bibliotecas participantes',val:dados.filter(r=>(r.kgDoados||0)>0).length,cor:'#5b21b6',bg:'#f5f3ff'},
   ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
 
-  document.getElementById('multa-grid').innerHTML=resumo.map((r,i)=>{
+  document.getElementById('multa-grid').innerHTML=dados.map((r,i)=>{
     const lista=r.multaL||[];
     const kg=(r.kgDoados||0);
     let bodyHTML;
@@ -1629,7 +1695,7 @@ function renderMulta(resumo){
       </div></div>`;
   }).join('');
 
-  document.getElementById('tabela-multa').innerHTML=resumo.flatMap((r,i)=>
+  document.getElementById('tabela-multa').innerHTML=dados.flatMap((r,i)=>
     (r.multaL||[]).length===0?[`<tr><td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td><td colspan="5" style="color:var(--text3);font-size:12px">Sem dados neste período</td></tr>`]:
     (r.multaL||[]).map(l=>`<tr>
       <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
@@ -1739,7 +1805,7 @@ function renderProgress(resumo){
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────────
-const TAB_MAP={geral:'geral',atendimento:'atendimento',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'biblioteca digital',catalogacao:'catalogação',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
+const TAB_MAP={geral:'geral',atendimento:'atendimento',cadastros:'cadastros',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'biblioteca digital',catalogacao:'catalogação',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
 function setTab(v,el){
   document.querySelectorAll('.tab,.nav-item').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(t=>t.classList.remove('active'));
@@ -1748,6 +1814,7 @@ function setTab(v,el){
   document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.trim().toLowerCase().includes(key))t.classList.add('active');});
   document.querySelectorAll('.nav-item').forEach(t=>{if(t.textContent.trim().toLowerCase().includes(key))t.classList.add('active');});
   if(el)el.classList.add('active');
+  setTimeout(()=>Object.values(chartsAtivos).forEach(c=>c&&c.resize()),0);
 }
 
 function subTab(el,prefix,panel){
