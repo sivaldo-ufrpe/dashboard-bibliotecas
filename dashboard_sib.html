@@ -66,21 +66,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .charts-row{display:grid;gap:12px;margin-bottom:12px}
 .cols-2{grid-template-columns:1fr 1fr}
 .cols-3{grid-template-columns:1fr 1fr 1fr}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow);min-width:0;overflow:hidden}
 .card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
 .card-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
 .chart-wrap{position:relative;width:100%}
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--text2)}
 .legend span{display:flex;align-items:center;gap:5px}
 .leg-sq{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.table-wrap{overflow-x:auto}
-.dt{width:100%;border-collapse:collapse;font-size:13px}
-.dt thead th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:0 12px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-.dt tbody td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.table-wrap{max-width:100%;overflow-x:auto}
+.dt{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.dt thead th{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:0 12px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:normal;overflow-wrap:anywhere}
+.dt tbody td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;overflow-wrap:anywhere;word-break:break-word}
 .dt tbody tr:last-child td{border-bottom:none}
 .dt tbody tr:hover td{background:var(--surface2)}
-.num{text-align:right;font-family:'DM Mono',monospace;font-weight:500}
-.pct{text-align:right;color:var(--text3);font-size:12px}
+.num{text-align:right;font-family:'DM Mono',monospace;font-weight:500;white-space:nowrap}
+.pct{text-align:right;color:var(--text3);font-size:12px;white-space:nowrap}
 .lib-pill{display:inline-flex;align-items:center;gap:6px;font-weight:500}
 .lib-pip{width:7px;height:7px;border-radius:50%}
 .badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:100px}
@@ -91,13 +91,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .badge-teal{background:#f0fdf9;color:#0f766e}
 .badge-gray{background:var(--surface2);color:var(--text3)}
 .detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px}
-.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow)}
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow);min-width:0;overflow:hidden}
 .detail-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .detail-name{font-size:14px;font-weight:600}
 .detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .detail-stat{background:var(--surface2);border-radius:8px;padding:10px 12px}
 .detail-stat-label{font-size:11px;color:var(--text3);margin-bottom:3px}
 .detail-stat-value{font-size:17px;font-weight:600;letter-spacing:-.02em}
+#multa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:12px}
+.multa-table{table-layout:fixed;min-width:0;font-size:12px}
+.multa-table th,.multa-table td{padding-left:6px;padding-right:6px;overflow-wrap:anywhere;word-break:break-word}
+.multa-table th:nth-child(1){width:29%}.multa-table th:nth-child(2){width:22%}.multa-table th:nth-child(3){width:10%}.multa-table th:nth-child(4){width:20%}.multa-table th:nth-child(5){width:19%}
 .tab-bar{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .tab{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s;user-select:none;white-space:nowrap}
 .tab:hover{color:var(--text)}
@@ -175,9 +179,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="nav-item" onclick="setTab('bases',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Bases de dados
     </div>
-    <div class="nav-item" onclick="setTab('minhaBib',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Biblioteca digital
-    </div>
     <div class="nav-item" onclick="setTab('catalogacao',this)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M8 2h8a2 2 0 012 2v18H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2H8z"/><path d="M9 7h6M9 11h6"/></svg>Catalogação
     </div>
@@ -202,7 +203,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="controls">
       <div class="select-wrap">
         <select id="sel-tri" onchange="loadAll()">
-          <option value="1" selected>1º trimestre</option>
+          <option value="1">1º trimestre</option>
           <option value="2">2º trimestre</option>
           <option value="3">3º trimestre</option>
           <option value="4">4º trimestre</option>
@@ -229,12 +230,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="tab" onclick="setTab('cadastros',this)">Cadastros</div>
       <div class="tab" onclick="setTab('acervo',this)">Acervo</div>
       <div class="tab" onclick="setTab('circulacao',this)">Circulação</div>
-      <div class="tab" onclick="setTab('restauracao',this)">Restauração</div>
+      <div class="tab" onclick="setTab('restauracao',this)">Restauro</div>
       <div class="tab" onclick="setTab('treinamentos',this)">Treinamentos</div>
       <div class="tab" onclick="setTab('deposito',this)">Depósito legal</div>
       <div class="tab" onclick="setTab('comut',this)">COMUT</div>
       <div class="tab" onclick="setTab('bases',this)">Bases de dados</div>
-      <div class="tab" onclick="setTab('minhaBib',this)">Biblioteca digital</div>
       <div class="tab" onclick="setTab('catalogacao',this)">Catalogação</div>
       <div class="tab" onclick="setTab('multa',this)">Multa Solidária</div>
       <div class="tab" onclick="setTab('normalizacao',this)">Normalização</div>
@@ -291,7 +291,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <thead><tr>
               <th>Biblioteca</th><th>Atendimentos</th><th>Empréstimos</th>
               <th>Devoluções</th><th>Novos títulos</th><th>Novos exemplares</th>
-              <th>Treinamentos</th><th>Status</th>
+              <th>Treinamentos</th>
             </tr></thead>
             <tbody id="tabela"></tbody>
           </table>
@@ -322,7 +322,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
     <!-- CADASTROS -->
     <div id="view-cadastros" class="view">
+      <div class="section-title">Cadastros nas bibliotecas físicas</div>
       <div class="kpi-grid" id="kpi-cadastros"></div>
+      <div class="section-title">Comparativo por tipo de biblioteca</div>
+      <div class="charts-row">
+        <div class="card">
+          <div class="card-title">Cadastros em bibliotecas físicas e digitais</div>
+          <div class="card-sub">Total no trimestre selecionado</div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c-cadastros-tipo" role="img" aria-label="Comparação de cadastros em bibliotecas físicas e digitais"></canvas></div>
+        </div>
+      </div>
       <div class="section-title">Cadastros por biblioteca</div>
       <div class="charts-row">
         <div class="card">
@@ -333,11 +342,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div class="section-title">Detalhamento por biblioteca</div>
       <div id="cadastros-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px"></div>
+      <div class="section-title" style="margin-top:24px">Cadastros - livros digitais</div>
+      <div class="info-banner">Serviço centralizado - dados de usuários cadastrados na Biblioteca digital.</div>
+      <div class="kpi-grid" id="kpi-minhaBib"></div>
+      <div class="section-title">Usuários cadastrados por trimestre</div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Usuários cadastrados</div>
+          <div class="card-sub">Evolução por trimestre</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-bar" role="img" aria-label="Usuários cadastrados por trimestre"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribuição por trimestre</div>
+          <div class="card-sub">Participação percentual</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-pizza" role="img" aria-label="Distribuição de cadastros da Biblioteca digital"></canvas></div>
+          <div class="legend" id="leg-minhaBib-pizza"></div>
+        </div>
+      </div>
+      <div class="section-title">Tabela detalhada</div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr>
+              <th>Trimestre</th>
+              <th style="text-align:right">Usuários cadastrados</th>
+              <th style="text-align:right">% do total</th>
+            </tr></thead>
+            <tbody id="tabela-minhaBib"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- ACERVO -->
     <div id="view-acervo" class="view">
-      <div class="section-title">Crescimento do Acervo por área</div>
+      <div class="section-title">Crescimento do acervo</div>
       <div class="charts-row cols-2">
         <div class="card">
           <div class="card-title">Novos títulos por área</div>
@@ -366,6 +405,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="card-title">Títulos por tipo de aquisição e biblioteca</div>
           <div class="card-sub">Participação relativa</div>
           <div id="doacao-progress"></div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:24px">Acervo total</div>
+      <div class="info-banner" id="acervo-total-atualizado">Dados do catálogo das bibliotecas.</div>
+      <div class="kpi-grid" id="kpi-acervo-total"></div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Títulos e exemplares por biblioteca</div>
+          <div class="card-sub">Acervo total registrado no catálogo</div>
+          <div class="chart-wrap" style="height:280px"><canvas id="c-acervo-total-lib" role="img" aria-label="Acervo total por biblioteca"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Exemplares por área do conhecimento</div>
+          <div class="card-sub">Distribuição consolidada</div>
+          <div class="chart-wrap" style="height:280px"><canvas id="c-acervo-total-area" role="img" aria-label="Acervo total por área"></canvas></div>
+          <div class="legend" id="leg-acervo-total-area"></div>
+        </div>
+      </div>
+      <div class="charts-row cols-2">
+        <div class="card">
+          <div class="card-title">Títulos por tipo de aquisição</div>
+          <div class="card-sub">Distribuição consolidada</div>
+          <div class="chart-wrap" style="height:260px"><canvas id="c-acervo-total-aquisicao" role="img" aria-label="Acervo total por tipo de aquisição"></canvas></div>
+          <div class="legend" id="leg-acervo-total-aquisicao"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Detalhamento por biblioteca</div>
+          <div class="card-sub">Dados obtidos da aba Catálogo</div>
+          <div id="acervo-total-grid"></div>
         </div>
       </div>
     </div>
@@ -527,39 +595,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
 
-    <!-- BIBLIOTECA DIGITAL -->
-    <div id="view-minhaBib" class="view">
-      <div class="info-banner">Serviço centralizado — dados de usuários cadastrados na Biblioteca digital.</div>
-      <div class="kpi-grid" id="kpi-minhaBib"></div>
-      <div class="section-title">Usuários cadastrados por trimestre</div>
-      <div class="charts-row cols-2">
-        <div class="card">
-          <div class="card-title">Usuários cadastrados</div>
-          <div class="card-sub">Evolução por trimestre</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-bar" role="img" aria-label="Usuários cadastrados por trimestre"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Distribuição por trimestre</div>
-          <div class="card-sub">Participação percentual</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="c-minhaBib-pizza" role="img" aria-label="Distribuição de cadastros da Biblioteca digital"></canvas></div>
-          <div class="legend" id="leg-minhaBib-pizza"></div>
-        </div>
-      </div>
-      <div class="section-title">Tabela detalhada</div>
-      <div class="card">
-        <div class="table-wrap">
-          <table class="dt">
-            <thead><tr>
-              <th>Trimestre</th>
-              <th style="text-align:right">Usuários cadastrados</th>
-              <th style="text-align:right">% do total</th>
-            </tr></thead>
-            <tbody id="tabela-minhaBib"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
     <!-- CATALOGAÇÃO -->
     <div id="view-catalogacao" class="view">
       <div class="info-banner">Serviço centralizado — dados de catalogação bibliográfica, autoridade, exemplares, JEPEX e fichas catalográficas.</div>
@@ -611,7 +646,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div id="view-multa" class="view">
       <div class="kpi-grid" id="kpi-multa"></div>
       <div class="section-title">Multa Solidária — detalhamento por biblioteca</div>
-      <div id="multa-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:12px"></div>
+      <div id="multa-grid"></div>
       <div class="section-title">Tabela consolidada — todas as bibliotecas</div>
       <div class="card">
         <div class="table-wrap">
@@ -743,6 +778,14 @@ async function fetchPrimeiraAba(id){
   }catch(e){return null;}
 }
 
+async function fetchCatalogo(id){
+  for(const aba of ['Catálogo','Cátalogo','Catalogo']){
+    const rows=await fetchAba(id,aba);
+    if(rows)return rows;
+  }
+  return null;
+}
+
 function parseCSV(txt){
   return txt.trim().split('\n').map(line=>{
     const cols=[];let cur='',inQ=false;
@@ -780,6 +823,29 @@ function linhasTipo(rows,tri,ano){
   if(!f)for(let i=1;i<rows.length;i++){
     const row=rows[i];if(!row||row.length<2)continue;
     const tipo=limpa(row[0]);if(tipo)out.push({tipo,valor:parseNum(row[row.length-1])});
+  }
+  return out;
+}
+
+// Catálogo: títulos, exemplares, tipo de aquisição e área do conhecimento.
+function linhasCatalogo(rows){
+  if(!rows||!rows.length)return[];
+  const norm=s=>limpa(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const header=rows[0]||[];
+  const col=(terms,fallback)=>{
+    const idx=header.findIndex(h=>terms.every(t=>norm(h).includes(t)));
+    return idx>=0?idx:fallback;
+  };
+  const idxT=col(['titulo'],0);
+  const idxE=col(['exemplar'],1);
+  const idxA=col(['aquisicao'],2);
+  const idxArea=col(['area'],3);
+  const out=[];
+  for(let i=1;i<rows.length;i++){
+    const row=rows[i];if(!row||row.length<2)continue;
+    const titulos=parseNum(row[idxT]),exemplares=parseNum(row[idxE]);
+    const aquisicao=limpa(row[idxA]),area=limpa(row[idxArea]);
+    if(titulos||exemplares||aquisicao||area)out.push({titulos,exemplares,aquisicao,area});
   }
   return out;
 }
@@ -1052,6 +1118,8 @@ async function loadAll(){
       const abas={};
       const fs=await Promise.all(ABAS_BIB.map(a=>fetchAba(bib.id,a).then(r=>({a,r}))));
       fs.forEach(({a,r})=>{if(r)abas[a]=r;});
+      const catalogo=await fetchCatalogo(bib.id);
+      if(catalogo)abas['Catálogo']=catalogo;
       return{nome:bib.nome,data:abas};
     }));
     G={};
@@ -1085,6 +1153,7 @@ function renderAll(tri,ano){
   const resumo=libs.map((nome,i)=>{
     const d=G[nome]||{};
     const acervoL=linhasAcervo(d['Acervo']||[],tri,ano);
+    const catalogoL=linhasCatalogo(d['Catálogo']||[]);
     const circL  =linhasCirc(d['Circulação']||[],tri,ano);
     const restL  =linhasRest(d['Conservação']||[],tri,ano);
     const treinL =linhasTrein(d['Treinamentos']||[],tri,ano);
@@ -1111,7 +1180,7 @@ function renderAll(tri,ano){
       kgDoados:    multaL.reduce((a,l)=>a+l.kg,0),
       normPresencial: normD.presencial,
       normOnline:     normD.online,
-      acervoL,circL,restL,treinL,depL,multaL,normD,cadastrosL,
+      acervoL,catalogoL,circL,restL,treinL,depL,multaL,normD,cadastrosL,
       atendL:linhasTipo(d['Atendimento']||[],tri,ano),
     };
   });
@@ -1126,8 +1195,9 @@ function renderAll(tri,ano){
   renderGeralCharts(resumo,libs);
   renderTabela(resumo);
   renderAtendimento(resumo,libs);
-  renderCadastros(resumo,libs);
+  renderCadastros(resumo,libs,minhaBibL);
   renderAcervo(resumo);
+  renderAcervoTotal(resumo);
   renderCirculacao(resumo);
   renderRestauracao(resumo);
   renderTreinamentos(resumo,libs);
@@ -1223,17 +1293,13 @@ function renderGeralCharts(resumo,libs){
 }
 
 function renderTabela(resumo){
-  const max=k=>Math.max(...resumo.map(r=>r[k]),1);
   document.getElementById('tabela').innerHTML=resumo.map((r,i)=>{
-    const score=(r.emp/max('emp')+r.titulos/max('titulos')+r.atendimentos/max('atendimentos'))/3;
-    const[bc,bl]=score>=.7?['badge-green','Destaque']:score>=.4?['badge-blue','Regular']:['badge-amber','Atenção'];
     return`<tr>
       <td><span class="lib-pill"><span class="lib-pip" style="background:${r.cor}"></span>${r.nome}</span></td>
       <td class="num">${fmt(r.atendimentos)}</td><td class="num">${fmt(r.emp)}</td>
       <td class="num">${fmt(r.dev)}</td><td class="num">${fmt(r.titulos)}</td>
       <td class="num">${fmt(r.exemplares)}</td>
-      <td class="num">${fmt(r.usuariosTrein)}</td>
-      <td><span class="badge ${bc}">${bl}</span></td></tr>`;
+      <td class="num">${fmt(r.usuariosTrein)}</td></tr>`;
   }).join('');
 }
 
@@ -1270,14 +1336,16 @@ function renderAtendimento(resumo,libs){
   }).join('');
 }
 
-function renderCadastros(resumo,libs){
+function renderCadastros(resumo,libs,minhaBibL){
   const cadResumo=resumo.filter(r=>r.nome!=='UAEADTEC');
   const total=cadResumo.reduce((a,r)=>a+(r.cadastros||0),0);
+  const totalDigital=minhaBibL.reduce((a,l)=>a+(l.usuarios||0),0);
   document.getElementById('kpi-cadastros').innerHTML=[
     {label:'Total de cadastros',val:total,cor:'#1d4ed8'},
     {label:'Bibliotecas com cadastros',val:cadResumo.filter(r=>(r.cadastros||0)>0).length,cor:'#0f766e'},
     {label:'Registros encontrados',val:cadResumo.reduce((a,r)=>a+(r.cadastrosL||[]).length,0),cor:'#5b21b6'},
   ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+  mkBar('c-cadastros-tipo',['Bibliotecas físicas','Bibliotecas digitais'],[total,totalDigital],['#1d4ed8','#0f766e']);
   mkBar('c-cadastros-lib',cadResumo.map(r=>r.nome),cadResumo.map(r=>r.cadastros||0),cadResumo.map(r=>r.cor));
   document.getElementById('cadastros-grid').innerHTML=cadResumo.map(r=>{
     const lista=r.cadastrosL||[];
@@ -1294,8 +1362,9 @@ function renderCadastros(resumo,libs){
 }
 
 function renderAcervo(resumo){
+  const dados=semUAEADTEC(resumo);
   const aT={},aE={};AREAS_C.forEach(k=>{aT[k]=0;aE[k]=0;});
-  resumo.forEach(r=>{
+  dados.forEach(r=>{
     const mt=agrupaArea(r.acervoL,'titulos');
     const me=agrupaArea(r.acervoL,'exemplares');
     AREAS_C.forEach(k=>{aT[k]+=mt[k];aE[k]+=me[k];});
@@ -1308,7 +1377,7 @@ function renderAcervo(resumo){
   document.getElementById('leg-area-exemplares').innerHTML=AREAS_C.map((k,i)=>
     `<span><span class="leg-sq" style="background:${CORES10[i]}"></span>${areaLabel(k)} ${totE>0?Math.round(aE[k]/totE*100):0}%</span>`).join('');
 
-  document.getElementById('acervo-grid').innerHTML=resumo.map((r,i)=>{
+  document.getElementById('acervo-grid').innerHTML=dados.map((r,i)=>{
     const mt=agrupaArea(r.acervoL,'titulos'),me=agrupaArea(r.acervoL,'exemplares');
     const linhas=AREAS_C.map(k=>({area:k,t:mt[k],e:me[k]})).filter(l=>l.t>0||l.e>0);
     const aHTML=linhas.length===0?semD(3):linhas.map(l=>
@@ -1335,25 +1404,69 @@ function renderAcervo(resumo){
     </div>`;
   }).join('');
 
-  const dTot={};resumo.forEach(r=>r.acervoL.forEach(l=>{if(l.doacao)dTot[l.doacao]=(dTot[l.doacao]||0)+l.titulos;}));
+  const dTot={};dados.forEach(r=>r.acervoL.forEach(l=>{if(l.doacao)dTot[l.doacao]=(dTot[l.doacao]||0)+l.titulos;}));
   const dtL=Object.keys(dTot),dtV=dtL.map(k=>dTot[k]);
   mkDonut('c-doacao',dtL,dtV,CORES10);
   const dtTotal=dtV.reduce((a,b)=>a+b,0);
   document.getElementById('leg-doacao').innerHTML=dtL.map((l,i)=>
     `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${dtTotal>0?Math.round(dtV[i]/dtTotal*100):0}%</span>`).join('');
 
-  const allTipos=[...new Set(resumo.flatMap(r=>r.acervoL.map(l=>l.doacao).filter(Boolean)))];
+  const allTipos=[...new Set(dados.flatMap(r=>r.acervoL.map(l=>l.doacao).filter(Boolean)))];
   let ph='';
   allTipos.forEach(tipo=>{
-    const vals=resumo.map(r=>r.acervoL.filter(l=>l.doacao===tipo).reduce((a,l)=>a+l.titulos,0));
+    const vals=dados.map(r=>r.acervoL.filter(l=>l.doacao===tipo).reduce((a,l)=>a+l.titulos,0));
     const mx=Math.max(...vals,1);
     ph+=`<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">${tipo}</div>`;
-    resumo.forEach((r,i)=>{ph+=`<div class="progress-row"><div class="progress-label">${r.nome}</div>
+    dados.forEach((r,i)=>{ph+=`<div class="progress-row"><div class="progress-label">${r.nome}</div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.round(vals[i]/mx*100)}%;background:${CORES[i]}"></div></div>
       <div class="progress-val">${fmt(vals[i])}</div></div>`;});
     ph+='</div>';
   });
   document.getElementById('doacao-progress').innerHTML=ph||`<p style="font-size:13px;color:var(--text3);padding:12px 0">Sem dados de aquisição.</p>`;
+}
+
+function renderAcervoTotal(resumo){
+  const dados=semUAEADTEC(resumo);
+  const exemplaresPorBib=dados.map(r=>r.catalogoL.reduce((a,l)=>a+l.exemplares,0));
+  const titulosPorBib=dados.map(r=>r.catalogoL.reduce((a,l)=>a+l.titulos,0));
+  const totalT=titulosPorBib.reduce((a,b)=>a+b,0);
+  const totalE=exemplaresPorBib.reduce((a,b)=>a+b,0);
+  document.getElementById('acervo-total-atualizado').textContent=
+    `Dados do catálogo das bibliotecas · atualização consultada em ${new Date().toLocaleString('pt-BR')}`;
+  document.getElementById('kpi-acervo-total').innerHTML=[
+    {label:'Títulos no acervo',val:totalT,cor:'#5b21b6'},
+    {label:'Exemplares no acervo',val:totalE,cor:'#854d0e'},
+    {label:'Bibliotecas com catálogo',val:dados.filter(r=>r.catalogoL.length>0).length,cor:'#0f766e'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.cor}">${fmt(k.val)}</div></div>`).join('');
+  mkGrouped('c-acervo-total-lib',dados.map(r=>r.nome),[
+    {label:'Títulos',data:titulosPorBib,backgroundColor:'#5b21b6',borderRadius:4,borderSkipped:false},
+    {label:'Exemplares',data:exemplaresPorBib,backgroundColor:'#854d0e',borderRadius:4,borderSkipped:false},
+  ]);
+
+  const porArea={},porAquisicao={};
+  dados.forEach(r=>r.catalogoL.forEach(l=>{
+    const area=l.area||'Não informado',aquisicao=l.aquisicao||'Não informado';
+    porArea[area]=(porArea[area]||0)+l.exemplares;
+    porAquisicao[aquisicao]=(porAquisicao[aquisicao]||0)+l.titulos;
+  }));
+  const areaLabels=Object.keys(porArea).sort((a,b)=>porArea[b]-porArea[a]);
+  const areaVals=areaLabels.map(k=>porArea[k]);
+  mkDonut('c-acervo-total-area',areaLabels,areaVals,CORES10);
+  document.getElementById('leg-acervo-total-area').innerHTML=areaLabels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${totalE>0?Math.round(areaVals[i]/totalE*100):0}%</span>`).join('');
+  const aquisicaoLabels=Object.keys(porAquisicao).sort((a,b)=>porAquisicao[b]-porAquisicao[a]);
+  const aquisicaoVals=aquisicaoLabels.map(k=>porAquisicao[k]);
+  mkDonut('c-acervo-total-aquisicao',aquisicaoLabels,aquisicaoVals,CORES10);
+  document.getElementById('leg-acervo-total-aquisicao').innerHTML=aquisicaoLabels.map((l,i)=>
+    `<span><span class="leg-sq" style="background:${CORES10[i%CORES10.length]}"></span>${l} ${totalT>0?Math.round(aquisicaoVals[i]/totalT*100):0}%</span>`).join('');
+
+  const maiorExemplar=Math.max(...exemplaresPorBib,1);
+  document.getElementById('acervo-total-grid').innerHTML=dados.map((r,i)=>`
+    <div class="progress-row">
+      <div class="progress-label">${r.nome}</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.round(exemplaresPorBib[i]/maiorExemplar*100)}%;background:${r.cor}"></div></div>
+      <div class="progress-val">${fmt(titulosPorBib[i])} / ${fmt(exemplaresPorBib[i])}</div>
+    </div>`).join('');
 }
 
 // ── CIRCULAÇÃO ────────────────────────────────────────────────────────────────
@@ -1675,11 +1788,11 @@ function renderMulta(resumo){
       bodyHTML=`<tr><td colspan="5" style="color:var(--text3);padding:16px;text-align:center;font-size:12px">Sem dados para este período</td></tr>`;
     } else {
       bodyHTML=lista.map(l=>`<tr>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${l.inst||''}">${l.inst||'—'}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap">${l.cnpj||'—'}</td>
+        <td title="${l.inst||''}">${l.inst||'—'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${l.cnpj||'—'}</td>
         <td class="num">${fmt(l.kg)}</td>
-        <td style="white-space:nowrap">${l.periodo||'—'}</td>
-        <td style="white-space:nowrap">${l.dataDoacao||'—'}</td>
+        <td>${l.periodo||'—'}</td>
+        <td>${l.dataDoacao||'—'}</td>
       </tr>`).join('');
     }
     return`<div class="card" style="min-height:120px">
@@ -1689,8 +1802,8 @@ function renderMulta(resumo){
         <span style="margin-left:auto;font-size:11px;color:var(--text3)">${fmt(kg)} kg doados</span>
       </div>
       <div class="table-wrap">
-        <table class="dt" style="min-width:480px"><thead><tr>
-          <th>Instituição</th><th>CNPJ</th><th style="text-align:right">kg</th><th>Período</th><th>Data doação</th>
+        <table class="dt multa-table"><thead><tr>
+          <th>Instituição</th><th>CNPJ</th><th style="text-align:right">kg</th><th>Período arrec.</th><th>Data doação</th>
         </tr></thead><tbody>${bodyHTML}</tbody></table>
       </div></div>`;
   }).join('');
@@ -1757,7 +1870,6 @@ function renderDetalhe(resumo){
         <div class="detail-stat"><div class="detail-stat-label">Títulos</div><div class="detail-stat-value" style="color:#5b21b6">${fmt(r.titulos)}</div></div>
         <div class="detail-stat"><div class="detail-stat-label">Exemplares</div><div class="detail-stat-value" style="color:#854d0e">${fmt(r.exemplares)}</div></div>
         <div class="detail-stat"><div class="detail-stat-label">Atendimentos</div><div class="detail-stat-value" style="color:#9f1239">${fmt(r.atendimentos)}</div></div>
-        <div class="detail-stat"><div class="detail-stat-label">Eventos</div><div class="detail-stat-value" style="color:#065f46">${fmt(r.eventos)}</div></div>
         <div class="detail-stat"><div class="detail-stat-label">Usuários treinados</div><div class="detail-stat-value" style="color:#0369a1">${fmt(r.usuariosTrein)}</div></div>
         <div class="detail-stat"><div class="detail-stat-label">Dep. legal recebidos</div><div class="detail-stat-value" style="color:#7c3aed">${fmt(r.depRec)}</div></div>
         <div class="detail-stat"><div class="detail-stat-label">Multa solidária (kg)</div><div class="detail-stat-value" style="color:#065f46">${fmt(r.kgDoados||0)}</div></div>
@@ -1805,7 +1917,7 @@ function renderProgress(resumo){
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────────
-const TAB_MAP={geral:'geral',atendimento:'atendimento',cadastros:'cadastros',acervo:'acervo',circulacao:'circula',restauracao:'restaura',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',minhaBib:'biblioteca digital',catalogacao:'catalogação',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
+const TAB_MAP={geral:'geral',atendimento:'atendimento',cadastros:'cadastros',acervo:'acervo',circulacao:'circula',restauracao:'restauro',treinamentos:'trein',deposito:'depósito',comut:'comut',bases:'base',catalogacao:'catalogação',multa:'multa',normalizacao:'normalização',detalhe:'biblioteca'};
 function setTab(v,el){
   document.querySelectorAll('.tab,.nav-item').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.view').forEach(t=>t.classList.remove('active'));
@@ -1827,6 +1939,7 @@ function subTab(el,prefix,panel){
 
 // ── INÍCIO ────────────────────────────────────────────────────────────────────
 const anoAtual=new Date().getFullYear();
+const triAtual=Math.floor(new Date().getMonth()/3)+1;
 const selAno=document.getElementById('sel-ano');
 [anoAtual-1,anoAtual].forEach(a=>{
   const opt=document.createElement('option');
@@ -1834,6 +1947,7 @@ const selAno=document.getElementById('sel-ano');
   if(a===anoAtual)opt.selected=true;
   selAno.appendChild(opt);
 });
+document.getElementById('sel-tri').value=triAtual;
 loadAll();
 </script>
 </body>
